@@ -33,6 +33,7 @@ from sardana.pool.controller import MotorController
 
 MAX_VEL = 1e5
 MAX_ACC = 1e-5
+STEP_RES = 1
 
 
 class SmaractMCSController(MotorController):
@@ -126,14 +127,25 @@ class SmaractMCSController(MotorController):
         @param value to be set
         """
         if name.lower() == "velocity":
-            self._log.debug('No velocity set')
-        elif name.lower() == "acceleration" or name.lower() == "deceleration":
-            self._log.debug('No acceleration set')
+            velocity = (value * self.attributes[axis]["step_per_unit"]
+                        * STEP_RES)
+            self.smaractMCS.command_inout("SetClosedLoopVelocity",
+                                          [int(axis), int(velocity)])
+
+        elif name.lower() == "acceleration":
+            acceleration = (value * self.attributes[axis]["step_per_unit"]
+                            * STEP_RES)
+            self.smaractMCS.command_inout("SetClosedLoopAcceleration",
+                                          [int(axis), int(acceleration)])
+
+        elif name.lower() == "deceleration":
+            self._log.debug('No deceleration set')
+
         elif name.lower() == "step_per_unit":
             self.attributes[axis]["step_per_unit"] = float(value)
+
         elif name.lower() == "base_rate":
             self._log.debug('No baserate set')
-
 
     def GetPar(self, axis, name):
         """ Get the standard pool motor parameters.
@@ -141,10 +153,24 @@ class SmaractMCSController(MotorController):
         @param name of the parameter to get the value
         @return the value of the parameter
         """
-        if name.lower() == "velocity":
+        if name.lower() == "max_velocity":
             return MAX_VEL
 
-        elif name.lower() == "acceleration" or name.lower() == "deceleration":
+        elif name.lower() == "velocity":
+            cl_velocity = self.smaractMCS.command_inout(
+                "GetClosedLoopVelocity", int(axis))
+            return float(cl_velocity
+                         / self.attributes[axis]["step_per_unit"]
+                         / STEP_RES)
+
+        elif name.lower() == "acceleration":
+            cl_acceleration = self.smaractMCS.command_inout(
+                "GetClosedLoopAcceleration", int(axis))
+            return float(cl_acceleration
+                         / self.attributes[axis]["step_per_unit"]
+                         / STEP_RES)
+
+        elif name.lower() == "max_acceleration":
             return MAX_ACC
 
         elif name.lower() == "step_per_unit":
