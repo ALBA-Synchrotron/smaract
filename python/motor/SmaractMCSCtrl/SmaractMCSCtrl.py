@@ -29,6 +29,7 @@
 ###########################################################################
 
 import PyTango
+from sardana import State
 from sardana.pool.controller import MotorController
 
 MAX_VEL = 1e5
@@ -85,12 +86,24 @@ class SmaractMCSController(MotorController):
         """ Get State of all axes with just one command to the Smaract MCS
         Controller. """
         for axis in self.axesList:
-            self.attributes[axis]["motorstate"] = self.smaractMCS.command_inout("GetState", axis)
+            self.attributes[axis]["motorstate"] = \
+                self.smaractMCS.command_inout("GetState", axis)
 
     def StateOne(self, axis):
-        state = self.smaractMCS.command_inout("GetState", axis)
+        sm_state = self.smaractMCS.command_inout("GetState", axis)
         # state = self.attributes[axis]['motorstate']
-        status = self.smaractMCS.command_inout("GetStatus", axis)
+        sm_status = self.smaractMCS.command_inout("GetStatus", axis)
+
+#       STOPPED:
+        if sm_state == 0:
+            state = State.On
+#       TARGETTING:
+        elif sm_state == 4:
+            state = State.Moving
+        else:
+            state = State.Init
+        status = sm_status
+
         return state, status
 
     # def PreReadAll(self):
@@ -112,13 +125,13 @@ class SmaractMCSController(MotorController):
     #     return True
 
     def StartOne(self, axis, position):
-        position = position*self.attributes[axis]["step_per_unit"]
-        self.smaractMCS.command_inout("MoveAbsolute", [axis, position] )
+        position = position * self.attributes[axis]["step_per_unit"]
+        self.smaractMCS.command_inout("MoveAbsolute",
+                                      [int(axis), int(position)])
 
     def StartAll(self):
         for axis, position in self.startMultiple.items():
-            position = position*self.attributes[axis]["step_per_unit"]
-            self.smaractMCS.command_inout("MoveAbsolute", [axis, position])
+            self.StartOne(axis, position)
 
     def SetPar(self, axis, name, value):
         """ Set the standard pool motor parameters.
