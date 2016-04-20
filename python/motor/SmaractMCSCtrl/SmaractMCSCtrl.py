@@ -46,13 +46,13 @@ class SmaractMCSController(MotorController):
 
     class_prop = {'SmaractMCSDevName':
                       {'Type': 'PyTango.DevString',
-                       'Description' : 'Device name of the Smaract MCS DS'}}
+                       'Description': 'Device name of the Smaract MCS DS'}}
 
     attributeNames = ["motorstate"]
 
     motor_extra_attributes = {"MotorState":
                                   {'Type': 'PyTango.DevBoolean',
-                                   'R/W Type': 'PyTango.READ'},}
+                                   'R/W Type': 'PyTango.READ'}}
 
     cs_extra_attributes = {}
 
@@ -61,7 +61,7 @@ class SmaractMCSController(MotorController):
     ctrl_extra_attributes.update(cs_extra_attributes)
 
     def __init__(self, inst, props, *args, **kwargs):
-        MotorController.__init__(self, inst, props,  *args, **kwargs)
+        MotorController.__init__(self, inst, props, *args, **kwargs)
         self.smaractMCS = PyTango.DeviceProxy(self.SmaractMCSDevName)
         self.axesList = []
         self.startMultiple = {}
@@ -71,7 +71,8 @@ class SmaractMCSController(MotorController):
     def AddDevice(self, axis):
         self._log.error("AddDevice entering...")
         self.axesList.append(axis)
-        self.attributes[axis] = {"step_per_unit" : 1.0, "base_rate" : float(MAX_VEL)}
+        self.attributes[axis] = {"step_per_unit": 1.0,
+                                 "base_rate": float(MAX_VEL)}
         self._log.error("AddDevice leaving...")
 
     def DeleteDevice(self, axis):
@@ -111,7 +112,9 @@ class SmaractMCSController(MotorController):
 
     def ReadAll(self):
         for axis in self.axesList:
-            self.positionMultiple[axis] = self.smaractMCS.command_inout("GetPosition", axis)/self.attributes[axis]["step_per_unit"]
+            self.positionMultiple[axis] = (
+                self.smaractMCS.command_inout("GetPosition", axis)
+                / self.attributes[axis]["step_per_unit"])
 
     def ReadOne(self, axis):
         return self.positionMultiple[axis]
@@ -216,7 +219,7 @@ class SmaractMCSController(MotorController):
         """
         pass
 
-    def SendToCtrl(self,cmd):
+    def SendToCtrl(self, cmd):
         """ Send custom native commands.
         @param string representing the command
         @return the result received
