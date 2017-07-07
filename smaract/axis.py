@@ -134,6 +134,9 @@ class SmaractBaseAxis(object):
 
 
 class SmaractSDCAxis(SmaractBaseAxis):
+    """
+    Specific class for SDC controllers.
+    """
     def __init__(self):
         super(SmaractSDCAxis, self).__init__()
 
@@ -205,6 +208,9 @@ class SmaractSDCAxis(SmaractBaseAxis):
 
 
 class SmaractMCSBaseAxis(SmaractBaseAxis):
+    """
+    Specific class for MCS controllers.
+    """
     def __init__(self):
         super(SmaractMCSBaseAxis, self).__init__()
 
