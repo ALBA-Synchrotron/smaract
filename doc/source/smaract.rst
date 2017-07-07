@@ -1,6 +1,6 @@
-****************************************************
-smaract: Pythonnlibrry for Smaract Motor Controllers
-****************************************************
+*****************************************************
+smaract: Python library for Smaract Motor Controllers
+*****************************************************
 
 This module is intended to be used as an entry point for the communication
 with Smaract motor controllers.
