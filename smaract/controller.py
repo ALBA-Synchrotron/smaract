@@ -1,6 +1,5 @@
-import weakref
 from .constants import *
-from .axis import SmaractBaseAxis
+from .axis import SmaractSDCAxis, SmaractMCSAngularAxis, SmaractMCSLinearAxis
 from .communication import ComBase
 
 
@@ -78,25 +77,15 @@ class SmaractBaseController(list, ComBase):
                    34: 'SHL20',
                    35: 'SCT'}
 
-    def __init__(self, axes):
+    def __init__(self, comm_type, *args):
         """
         Class constructor. Requires an axis or list of axes from class
         SmaractBase axis (or derived classes).
 
         :param axes: axis or list of axes.
         """
-        # TODO: Implement an automatic axis creation constructor.
-        # TODO: Implement an addition axis method.
-        super(SmaractBaseController, self).__init__()
-        if type(axes) is not list:
-            axes = list(axes)
-        if not all([isinstance(x, SmaractBaseAxis) for x in axes]):
-            raise ValueError("Not all elements supplied are valid axis")
-        else:
-            for i, a in enumerate(axes):
-                a._id = i
-                a._parent = weakref.ref(self)
-                self.append(a)
+        list.__init__(self)
+        ComBase.__init__(self, comm_type, *args)
 
     def send_cmd(self, cmd):
         """
@@ -158,8 +147,10 @@ class SmaractSDCController(SmaractBaseController):
     (SDC). This class extends the base class with the ASCII commands specific
     for the SDC motion controller.
     """
-    def __init__(self, axes):
-        super(SmaractSDCController, self).__init__(axes)
+    def __init__(self, comm_type, *args):
+        SmaractBaseController.__init__(self, comm_type, *args)
+        axis = SmaractSDCAxis(self)
+        self.append(axis)
 
 
 class SmaractMCSController(SmaractBaseController):
@@ -168,8 +159,11 @@ class SmaractMCSController(SmaractBaseController):
     (MCS). This class extends the base class with the ASCII commands specific
     for the MCS motion controller.
     """
-    def __init__(self, axes):
-        super(SmaractMCSController, self).__init__(axes)
+
+    def __init__(self, comm_type, *args):
+        SmaractBaseController.__init__(self, comm_type, *args)
+
+        # TODO: implement the axes creation
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------
