@@ -23,7 +23,7 @@ class SmaractBaseAxis(object):
         """
         str_cmd = "%s%d" % (str_cmd, self._id)
         cmd = "%s" % (str_cmd + "".join([",%d" % i for i in pars]))
-        return self.parent.send_cmd(cmd)
+        return self._parent.send_cmd(cmd)
 
     # 3.2 - Configuration commands
     # -------------------------------------------------------------------------
@@ -454,7 +454,6 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param hold_time: NOT IMPLEMENTED YET, set to 0.
         :return: None
         """
-        hold_time = 0
         is_force_in_range(force)
         is_speed_in_range(speed)
         is_hold_time_in_range(hold_time)
