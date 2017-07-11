@@ -5,14 +5,14 @@ class SmaractBaseAxis(object):
     """
     Smaract Axis Base class. Contains the common Smaract ASCii API for any
     Smaract axis. The methods here implemented correspond to those
-    at the axis level. The send_cmd function wrappers the current controller
-    send_cmd method.
+    at the axis level. The _send_cmd function wrappers the current controller
+    _send_cmd method.
     """
     def __init__(self):
         self._id = 0
         self._parent = None
 
-    def send_cmd(self, str_cmd, *pars):
+    def _send_cmd(self, str_cmd, *pars):
         """
         Send command function used to retrieve controller information at the
         axis level.
@@ -36,7 +36,7 @@ class SmaractBaseAxis(object):
 
         :return: either 0 or 1.
         """
-        ans = self.send_cmd('GSD')
+        ans = self._send_cmd('GSD')
         return int(ans[-1])
 
     def set_safe_direction(self, direction):
@@ -47,7 +47,7 @@ class SmaractBaseAxis(object):
         :param direction: either 0 (forward) or 1 (backward).
         :return: None
         """
-        self.send_cmd('SSD', direction)
+        self._send_cmd('SSD', direction)
 
     def get_sensor_type(self):
         """
@@ -56,7 +56,7 @@ class SmaractBaseAxis(object):
 
         :return: Sensor code.
         """
-        ans = self.send_cmd('GST')
+        ans = self._send_cmd('GST')
         sensor_code = int(ans.rsplit(',', 1)[1])
         return self._parent.SENSOR_CODE[sensor_code]
 
@@ -69,7 +69,7 @@ class SmaractBaseAxis(object):
 
         :return: None
         """
-        self.send_cmd('CS')
+        self._send_cmd('CS')
 
     def find_reference_mark(self, direction, hold_time=0, auto_zero=0):
         """
@@ -84,7 +84,7 @@ class SmaractBaseAxis(object):
         :param auto_zero: flag to reset the position to 0.
         :return: None
         """
-        self.send_cmd('FRM', direction, hold_time, auto_zero)
+        self._send_cmd('FRM', direction, hold_time, auto_zero)
 
     def move_step(self, steps, amplitude, frequency):
         """
@@ -99,7 +99,7 @@ class SmaractBaseAxis(object):
         is_steps_in_range(steps)
         is_amplitude_in_range(amplitude)
         is_frequency_in_range(frequency)
-        self.send_cmd('MST', steps, amplitude, frequency)
+        self._send_cmd('MST', steps, amplitude, frequency)
 
     def stop(self):
         """
@@ -108,7 +108,7 @@ class SmaractBaseAxis(object):
 
         :return: None
         """
-        self.send_cmd('S')
+        self._send_cmd('S')
 
     # 3.4 - Positioner feedback commands
     # -------------------------------------------------------------------------
@@ -119,7 +119,7 @@ class SmaractBaseAxis(object):
 
         :return: current positioner position.
         """
-        ans = self.send_cmd('GP')
+        ans = self._send_cmd('GP')
         return float(ans.split(',')[1])
 
     def get_status(self):
@@ -129,7 +129,7 @@ class SmaractBaseAxis(object):
 
         :return: channel status code.
         """
-        ans = self.send_cmd('GS')
+        ans = self._send_cmd('GS')
         return int(ans.split(',')[1])
 
 
@@ -149,7 +149,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
 
         :return: current target position.
         """
-        ans = self.send_cmd('GTP')
+        ans = self._send_cmd('GTP')
         return float(ans.split(',')[1])
 
     # 3.5 - Miscellaneous commands
@@ -161,7 +161,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
 
         :return: error code.
         """
-        ans = self.send_cmd('GES')
+        ans = self._send_cmd('GES')
         return int(ans.split(',')[1, 2])
 
     def get_error_queue(self):
@@ -190,7 +190,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
         :return: entry value.
         """
         is_row_in_range(row)
-        ans = self.send_cmd('GTE', table, row)
+        ans = self._send_cmd('GTE', table, row)
         return float(ans.split(',')[-1])
 
     def set_table_entry(self, table, row, value):
@@ -204,7 +204,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
         :return: None
         """
         is_row_in_range(row)
-        self.send_cmd('STE', table, row, int(value))
+        self._send_cmd('STE', table, row, int(value))
 
 
 class SmaractMCSBaseAxis(SmaractBaseAxis):
@@ -224,7 +224,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: channel type code
         """
-        ans = self.send_cmd('GCT')
+        ans = self._send_cmd('GCT')
         return float(ans.split(',')[1])
 
     # 3.2 - Configuration commands
@@ -236,7 +236,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: acceleration value.
         """
-        ans = self.send_cmd('GCLA')
+        ans = self._send_cmd('GCLA')
         return float(ans.split(',')[1])
 
     def get_closed_loop_vel(self):
@@ -246,7 +246,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: velocity value.
         """
-        ans = self.send_cmd('GCLS')
+        ans = self._send_cmd('GCLS')
         return float(ans.split(',')[1])
 
     def get_channel_property(self, key):
@@ -257,7 +257,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param key: key value.
         :return: value retrieved.
         """
-        ans = self.send_cmd('GCLS', key)
+        ans = self._send_cmd('GCLS', key)
         return int(ans.split(',')[-1])
 
     def get_end_effector_type(self):
@@ -268,7 +268,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return:
         """
-        ans = self.send_cmd('GEET')
+        ans = self._send_cmd('GEET')
         return [int(x) for x in ans.split(',')[-3:]]
 
     def get_scale(self):
@@ -278,7 +278,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: (scale shift, inverted flag)
         """
-        ans = self.send_cmd('GSC')
+        ans = self._send_cmd('GSC')
         return [float(x) for x in ans.split(',')[-2:]]
 
     def set_accumulate_rel_pos(self, enable=1):
@@ -290,7 +290,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param enable: 0 (no accumulation) 1 (accumulation).
         :return:
         """
-        self.send_cmd('SARP', enable)
+        self._send_cmd('SARP', enable)
 
     def set_closed_loop_acc(self, acceleration):
         """
@@ -301,7 +301,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :return: None
         """
         is_acceleration_in_range(acceleration)
-        self.send_cmd(('SCLA', acceleration))
+        self._send_cmd(('SCLA', acceleration))
 
     def set_closed_loop_max_freq(self, frequency):
         """
@@ -312,7 +312,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :return: None
         """
         is_frequency_in_range(frequency)
-        self.send_cmd('SCLF', frequency)
+        self._send_cmd('SCLF', frequency)
 
     def set_closed_loop_vel(self, velocity):
         """
@@ -323,7 +323,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :return: None
         """
         is_velocity_in_range(velocity)
-        self.send_cmd(('SCLS', velocity))
+        self._send_cmd(('SCLS', velocity))
 
     def set_channel_property(self, key, value):
         """
@@ -334,7 +334,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param value: property value
         :return: None
         """
-        self.send_cmd('SCP', key, value)
+        self._send_cmd('SCP', key, value)
 
     def set_end_effector_type(self, eff_type, p1, p2):
         """
@@ -346,7 +346,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param p2: parameter 2.
         :return: None
         """
-        self.send_cmd('SEET', eff_type, p1, p2)
+        self._send_cmd('SEET', eff_type, p1, p2)
 
     def set_position(self, position):
         """
@@ -357,7 +357,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param position: value
         :return: None
         """
-        self.send_cmd('SP', position)
+        self._send_cmd('SP', position)
 
     def set_report_on_complete(self, enable):
         """
@@ -367,7 +367,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param enable: 0 (no report) 1 (report).
         :return: None
         """
-        self.send_cmd('SRC', enable)
+        self._send_cmd('SRC', enable)
 
     def set_report_on_triggered(self, enable):
         """
@@ -378,7 +378,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param enable: 0 (no report) 1 (report).
         :return: None
         """
-        self.send_cmd('SRT', enable)
+        self._send_cmd('SRT', enable)
 
     def set_scale(self, shift, inverted):
         """
@@ -389,7 +389,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param inverted: scale inversion (0: disabled, 1:enabled).
         :return: None
         """
-        self.send_cmd('SSC', shift, inverted)
+        self._send_cmd('SSC', shift, inverted)
 
     def set_sensor_type(self, sensor_type):
         """
@@ -399,7 +399,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param sensor_type: sensor type code.
         :return: None
         """
-        self.send_cmd('SST', sensor_type)
+        self._send_cmd('SST', sensor_type)
 
     def set_step_while_scan(self, enable=1):
         """
@@ -410,7 +410,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param enable: 0 (forbid steps) or 1 (allow steps).
         :return: None
         """
-        self.send_cmd('SSW', enable)
+        self._send_cmd('SSW', enable)
 
     def set_zero_force(self):
         """
@@ -419,7 +419,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: None
         """
-        self.send_cmd('SZF')
+        self._send_cmd('SZF')
 
     # 3.2 - Movement control commands
     # -------------------------------------------------------------------------
@@ -432,7 +432,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param trigger_source: trigger source code
         :return: None
         """
-        self.send_cmd('ATC', trigger_source)
+        self._send_cmd('ATC', trigger_source)
 
     def clean_triggered_command_queue(self):
         """
@@ -442,7 +442,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: None
         """
-        self.send_cmd('CTCQ')
+        self._send_cmd('CTCQ')
 
     def move_gripper_force_absolute(self, force, speed, hold_time=0):
         """
@@ -457,7 +457,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         is_force_in_range(force)
         is_speed_in_range(speed)
         is_hold_time_in_range(hold_time)
-        self.send_cmd('MGFA', force, speed, hold_time)
+        self._send_cmd('MGFA', force, speed, hold_time)
 
     def move_gripper_opening_absolute(self, opening, speed):
         """
@@ -471,7 +471,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         is_opening_in_range(opening)
         is_speed_in_range(speed)
-        self.send_cmd('MGOA', opening, speed)
+        self._send_cmd('MGOA', opening, speed)
 
     def move_gripper_opening_relative(self, opening, speed):
         """
@@ -486,7 +486,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         is_opening_relative_in_range(opening)
         is_speed_in_range(speed)
-        self.send_cmd('MGOA', opening, speed)
+        self._send_cmd('MGOA', opening, speed)
 
     def move_scan_absolute(self, target, scan_speed):
         """
@@ -499,7 +499,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         is_target_in_range(target)
         is_scan_speed_in_range(scan_speed)
-        self.send_cmd('MSCA', target, scan_speed)
+        self._send_cmd('MSCA', target, scan_speed)
 
     def move_scan_relative(self, target, scan_speed):
         """
@@ -513,7 +513,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         is_target_relative_in_range(target)
         is_scan_speed_in_range(scan_speed)
-        self.send_cmd('MSCR', target, scan_speed)
+        self._send_cmd('MSCR', target, scan_speed)
 
     # 3.4 - Positioner feedback commands
     # -------------------------------------------------------------------------
@@ -525,7 +525,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param buffer_idx: buffer index for the selected channel.
         :return: (buffer index, data-1, data-2, ..., data-n)
         """
-        ans = self.send_cmd('GB', buffer_idx)
+        ans = self._send_cmd('GB', buffer_idx)
         return [float(x) for x in ans.split(',')[2:]]
 
     def get_force(self):
@@ -535,7 +535,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: force value in 1/10 uN
         """
-        ans = self.send_cmd('GF')
+        ans = self._send_cmd('GF')
         return float(ans.split(',')[-1])
 
     def get_gripper_opening(self):
@@ -545,7 +545,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: voltage opening value in 1/100 Volts.
         """
-        ans = self.send_cmd('GGO')
+        ans = self._send_cmd('GGO')
         return float(ans.split(',')[-1])
 
     def get_physical_position_known(self):
@@ -555,7 +555,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: 0 (unknown) or 1 (known)
         """
-        ans = self.send_cmd('GPPK')
+        ans = self._send_cmd('GPPK')
         return int(ans.split(',')[1])
 
     def get_voltage_level(self):
@@ -565,7 +565,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: 12-bit value (0-100 Volts)
         """
-        ans = self.send_cmd('GVL')
+        ans = self._send_cmd('GVL')
         return float(ans.split(',')[-1])
 
     # 3.5 - Miscellaneous commands
@@ -577,7 +577,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: serial number (hexadecimal).
         """
-        self.send_cmd('GSN')
+        self._send_cmd('GSN')
 
     def get_firmware_version(self):
         """
@@ -586,7 +586,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         :return: firmware version string code.
         """
-        ans = self.send_cmd('GFV')
+        ans = self._send_cmd('GFV')
         # TODO: create human-readable string for return
         return ans.split(',')[1:]
 
@@ -598,10 +598,10 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :param byte_idx: feature byte targeted.
         :return: feature permissions size or feature bit code.
         """
-        _ans = self.send_cmd('GFP', 255)
+        _ans = self._send_cmd('GFP', 255)
         n_feat_perm_bytes = _ans.split(',')[-1]
         if byte_idx <= n_feat_perm_bytes:
-            ans = self.send_cmd('FP', byte_idx)
+            ans = self._send_cmd('FP', byte_idx)
             return bin(ans.split(',')[-1])[-1]
         else:
             return -1
@@ -620,7 +620,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
         :return: (minAngle, minRev, maxAngle, maxRev)
         """
-        ans = self.send_cmd('GAL')
+        ans = self._send_cmd('GAL')
         return [float(x) for x in ans.split(',')[-4:]]
 
     def set_angle_limit(self, min_angle, min_rev, max_angle, max_rev):
@@ -636,7 +636,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         """
         is_angle_in_range([min_angle, max_angle])
         is_revolution_in_range([min_rev, max_rev])
-        self.send_cmd('SAL', min_angle, min_rev, max_angle, max_rev)
+        self._send_cmd('SAL', min_angle, min_rev, max_angle, max_rev)
 
     def move_angle_absolute(self, angle, rev, hold_time=0):
         """
@@ -651,7 +651,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         is_angle_in_range(angle)
         is_revolution_in_range(rev)
         is_hold_time_in_range(hold_time)
-        self.send_cmd('MAA', angle, rev, hold_time)
+        self._send_cmd('MAA', angle, rev, hold_time)
 
     def move_angle_relative(self, angle, rev, hold_time=0):
         """
@@ -667,7 +667,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         is_angle_relative_in_range(angle)
         is_revolution_in_range(rev)
         is_hold_time_in_range(hold_time)
-        self.send_cmd('MAR', angle, rev, hold_time)
+        self._send_cmd('MAR', angle, rev, hold_time)
 
     # 3.4 - Positioner feedback commands
     # -------------------------------------------------------------------------
@@ -678,7 +678,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
         :return: (angle, revolution) in udeg.
         """
-        ans = self.send_cmd('GA')
+        ans = self._send_cmd('GA')
         # TODO: convert tuple (angle, rev) to angle.
         return [float(x) for x in ans.split(',')[-2:]]
 
@@ -696,7 +696,7 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
         :param max_pos: maximum position.
         :return: None
         """
-        self.send_cmd('SPL', min_pos, max_pos)
+        self._send_cmd('SPL', min_pos, max_pos)
 
     def get_position_limit(self):
         """
@@ -705,7 +705,7 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
 
         :return: (min position, max_position)
         """
-        ans = self.send_cmd('GPL')
+        ans = self._send_cmd('GPL')
         return [float(x) for x in ans.split(',')[-2:]]
 
     def move_position_absolute(self, position, hold_time=0):
@@ -718,7 +718,7 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
         :return: None
         """
         is_hold_time_in_range(hold_time)
-        self.send_cmd('MPA', position, hold_time)
+        self._send_cmd('MPA', position, hold_time)
 
     def move_position_relative(self, position, hold_time=0):
         """
@@ -731,4 +731,4 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
         :return: None
         """
         is_hold_time_in_range(hold_time)
-        self.send_cmd('MPR', position, hold_time)
+        self._send_cmd('MPR', position, hold_time)
