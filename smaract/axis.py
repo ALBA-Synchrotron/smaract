@@ -1,3 +1,4 @@
+import weakref
 from .constants import *
 
 
@@ -8,9 +9,9 @@ class SmaractBaseAxis(object):
     at the axis level. The _send_cmd function wrappers the current controller
     _send_cmd method.
     """
-    def __init__(self):
+    def __init__(self, parent):
         self._id = 0
-        self._parent = None
+        self._parent = weakref.ref(parent)
 
     def _send_cmd(self, str_cmd, *pars):
         """
@@ -137,8 +138,6 @@ class SmaractSDCAxis(SmaractBaseAxis):
     """
     Specific class for SDC controllers.
     """
-    def __init__(self):
-        super(SmaractSDCAxis, self).__init__()
 
     # 3.4 - Positioner feedback commands
     # -------------------------------------------------------------------------
@@ -211,8 +210,6 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
     """
     Specific class for MCS controllers.
     """
-    def __init__(self):
-        super(SmaractMCSBaseAxis, self).__init__()
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------
@@ -608,8 +605,6 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
 
 class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
-    def __init__(self):
-        super(SmaractMCSAngularAxis, self).__init__()
 
     # 3.2 - Configuration commands
     # -------------------------------------------------------------------------
@@ -684,8 +679,6 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
 
 class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
-    def __init__(self):
-        super(SmaractMCSLinearAxis, self).__init__()
 
     def set_position_limit(self, min_pos, max_pos):
         """
