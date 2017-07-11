@@ -77,6 +77,10 @@ class SmaractBaseController(list, ComBase):
                    34: 'SHL20',
                    35: 'SCT'}
 
+    LINEAR_SENSORS = [1, 5, 6, 9, 18, 21, 24, 32, 35]
+
+    ROTARY_SENSORS = [2, 8, 14, 20, 22, 23, 25, 26, 27, 28, 29]
+
     def __init__(self, comm_type, *args):
         """
         Class constructor. Requires an axis or list of axes from class
@@ -163,7 +167,32 @@ class SmaractMCSController(SmaractBaseController):
     def __init__(self, comm_type, *args):
         SmaractBaseController.__init__(self, comm_type, *args)
 
-        # TODO: implement the axes creation
+        # Configure communication mode
+        mode = 0  # SYNC, the communication library work with acknowledge
+        cmd = 'SCM%d' % mode
+        self.send_cmd(cmd)
+        self._create_axes()
+
+    def _create_axes(self):
+        try:
+            while True:
+                self.pop()
+        except IndexError:
+            pass
+
+        for id in range(self.nchannels):
+            ans = self.send_cmd('GST')
+            sensor_code = int(ans.rsplit(',', 1)[1])
+            if sensor_code in self.LINEAR_SENSORS:
+                axis = SmaractMCSLinearAxis(self, id)
+                self.append(axis)
+            elif sensor_code in self.ROTARY_SENSORS:
+                axis = SmaractMCSAngularAxis(self, id)
+                self.append(axis)
+            else:
+                # TODO: decide what to do
+                print('There is not axis class for sensor code %d' %
+                      sensor_code)
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------
@@ -178,15 +207,18 @@ class SmaractMCSController(SmaractBaseController):
         ans = self.send_cmd('GCM')
         return int(ans[-1])
 
-    def set_communication_mode(self, mode):
-        """
-        Sets the type of communication with the controller.
-
-        :param mode: 0 (SYNC) or 1 (ASYMC)
-        :return: None
-        """
-        cmd = 'SCM%d' % mode
-        self.send_cmd(cmd)
+    # The communication class is based on synchronous communication, for that
+    #  reason it is not possible to change the type of communication.
+    # @communication_mode.setter
+    # def communication_mode(self, mode):
+    #     """
+    #     Sets the type of communication with the controller.
+    #
+    #     :param mode: 0 (SYNC) or 1 (ASYMC)
+    #     :return: None
+    #     """
+    #     cmd = 'SCM%d' % mode
+    #     self.send_cmd(cmd)
 
     def reset(self):
         """
