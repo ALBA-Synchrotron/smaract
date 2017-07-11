@@ -183,14 +183,14 @@ class SmaractMCSController(SmaractBaseController):
         except IndexError:
             pass
 
-        for id in range(self.nchannels):
+        for axis_nr in range(self.nchannels):
             ans = self.send_cmd('GST')
             sensor_code = int(ans.rsplit(',', 1)[1])
             if sensor_code in self.LINEAR_SENSORS:
-                axis = SmaractMCSLinearAxis(self, id)
+                axis = SmaractMCSLinearAxis(self, axis_nr)
                 self.append(axis)
             elif sensor_code in self.ROTARY_SENSORS:
-                axis = SmaractMCSAngularAxis(self, id)
+                axis = SmaractMCSAngularAxis(self, axis_nr)
                 self.append(axis)
             else:
                 # TODO: decide what to do

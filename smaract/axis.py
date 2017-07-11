@@ -9,8 +9,8 @@ class SmaractBaseAxis(object):
     at the axis level. The _send_cmd function wrappers the current controller
     _send_cmd method.
     """
-    def __init__(self, parent):
-        self._id = 0
+    def __init__(self, parent, axis_nr=0):
+        self._axis_nr = axis_nr
         self._parent = weakref.ref(parent)
 
     def _send_cmd(self, str_cmd, *pars):
@@ -22,7 +22,7 @@ class SmaractBaseAxis(object):
         :param pars: optional parameters required by the command.
         :return: command answer.
         """
-        str_cmd = "%s%d" % (str_cmd, self._id)
+        str_cmd = "%s%d" % (str_cmd, self._axis_nr)
         cmd = "%s" % (str_cmd + "".join([",%d" % i for i in pars]))
         return self._parent.send_cmd(cmd)
 
