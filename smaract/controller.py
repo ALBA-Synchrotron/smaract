@@ -112,7 +112,8 @@ class SmaractBaseController(list, ComBase):
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------
-    def get_version(self):
+    @property
+    def version(self):
         """
         Get the interface version of the system.
 
@@ -122,7 +123,8 @@ class SmaractBaseController(list, ComBase):
         ans = self.send_cmd(cmd)
         return 'Version: %s' % '.'.join(ans[2:].split(','))
 
-    def get_nchannels(self):
+    @property
+    def nchannels(self):
         """
         GEt the number of channels available (does not represent the number of
         currently connected positioners and effectors). The channels indexed are
@@ -134,7 +136,8 @@ class SmaractBaseController(list, ComBase):
         ans = self.send_cmd(cmd)
         return int(ans[1:])
 
-    def get_id(self):
+    @property
+    def id(self):
         """
         Identify the controller with a unique ID.
 
@@ -196,7 +199,8 @@ class SmaractMCSController(SmaractBaseController):
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------
-    def get_communication_mode(self):
+    @property
+    def communication_mode(self):
         """
         Gets the type of communication with the controller.
         0: synchronous communication (SYNC).
@@ -244,7 +248,8 @@ class SmaractMCSController(SmaractBaseController):
 
     # 3.2 - Configuration commands
     # -------------------------------------------------------------------------
-    def get_sensor_enabled(self):
+    @property
+    def sensor_enabled(self):
         """
         Gets the current sensor operation mode.
 
@@ -258,7 +263,8 @@ class SmaractMCSController(SmaractBaseController):
         ans = self.send_cmd(cmd)
         return str(ans[-1])
 
-    def set_sensor_enabled(self, enabled):
+    @sensor_enabled.setter
+    def sensor_enabled(self, enabled):
         """
         Sets the current sensor operation mode.
 
