@@ -2,22 +2,6 @@ from serial import Serial
 from socket import socket, AF_INET, SOCK_STREAM
 
 
-# Define communication protocols
-SERIAL_COM = 1
-SERIAL_DS = 2
-SOCKET_COM = 3
-
-
-def _prepare_cmd(cmd):
-    final_cmd = ':%s\n' % cmd
-    return final_cmd
-
-
-def _prepare_answer(raw_ans):
-    ans = raw_ans[1:-1]
-    return ans
-
-
 def comm_error_handler(f):
     """
     Error handling function (decorator).
@@ -35,6 +19,33 @@ def comm_error_handler(f):
     return new_func
 
 
+class CommType(object):
+    Serial = 1
+    SerialTango = 2
+    Socket = 3
+
+
+class SmaractCommunication(object):
+    """
+    Abstract class which provides a certain communication layer to the smaract
+    motion controller.
+    """
+    def __init__(self, comm_type, *args):
+        if comm_type == CommType.Serial:
+            self._comm = SerialCom(*args)
+        elif comm_type == CommType.SerialTango:
+            self._comm = SerialTangoCom(*args)
+        elif comm_type == CommType.Socket:
+            self._comm = SocketCom(*args)
+        else:
+            raise ValueError()
+
+    def send_cmd(self, cmd):
+        cmd = ':%s\n' % cmd
+        ans = self._comm.send_cmd(cmd)
+        return ans[1:-1]
+
+
 class SerialCom(Serial):
     """
     Class which implements the Serial communication layer with ASCII interface
@@ -43,16 +54,14 @@ class SerialCom(Serial):
     @comm_error_handler
     def send_cmd(self, cmd):
         self.flush()
-        data = _prepare_cmd(cmd)
-        self.write(data)
-        ans = _prepare_answer(self.readline())
-        return ans
+        self.write(cmd)
+        return self.readline()
 
 
-class SerialDSCom(object):
+class SerialTangoCom(object):
     """
-    Class which implements the Serial (through TANGO DS Serial) communication
-    layer with ASCii interface for Smaract motion controllers.
+    Class which implements the Serial (through TANGO Device Serial)
+    communication layer with ASCii interface for Smaract motion controllers.
     """
     def __init__(self, device_name):
         import PyTango
@@ -62,10 +71,8 @@ class SerialDSCom(object):
     def send_cmd(self, cmd):
         # flush both input and output
         self.device.DevSerFlush(2)
-        data = _prepare_cmd(cmd)
-        self.device.DevSerWriteString(data)
-        ans = _prepare_answer(self.device.DevSerReadLine())
-        return ans
+        self.device.DevSerWriteString(cmd)
+        return self.device.DevSerReadLine()
 
 
 class SocketCom(socket):
@@ -80,26 +87,5 @@ class SocketCom(socket):
 
     @comm_error_handler
     def send_cmd(self, cmd):
-        data = _prepare_cmd(cmd)
-        self.sendall(data)
-        ans = _prepare_answer(self.recv(1024))
-        return ans
-
-
-class ComBase(object):
-    """
-    Abstract class which provides a certain communication layer to the smaract
-    motion controller.
-    """
-    def __init__(self, comm_type, *args):
-        if comm_type == SERIAL_COM:
-            self.com = SerialCom(*args)
-        elif comm_type == SERIAL_DS:
-            self.com = SerialDSCom(*args)
-        elif comm_type == SOCKET_COM:
-            self.com = SocketCom(*args)
-        else:
-            raise ValueError()
-
-    def send_cmd(self, cmd):
-        raise NotImplemented()
+        self.sendall(cmd)
+        return self.recv(1024)

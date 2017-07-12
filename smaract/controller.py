@@ -1,9 +1,9 @@
 from .constants import *
 from .axis import SmaractSDCAxis, SmaractMCSAngularAxis, SmaractMCSLinearAxis
-from .communication import ComBase
+from .communication import SmaractCommunication
 
 
-class SmaractBaseController(list, ComBase):
+class SmaractBaseController(list):
     """
     Smaract Controller Base class. Contains the common Smaract ASCii API for any
     Smaract motor controller. The methods here implemented correspond to those
@@ -89,7 +89,7 @@ class SmaractBaseController(list, ComBase):
         :param axes: axis or list of axes.
         """
         list.__init__(self)
-        ComBase.__init__(self, comm_type, *args)
+        self._comm = SmaractCommunication(comm_type, *args)
 
     def send_cmd(self, cmd):
         """
@@ -99,7 +99,7 @@ class SmaractBaseController(list, ComBase):
         Interface.
         :return:
         """
-        ans = self.com.send_cmd(cmd)
+        ans = self._comm.send_cmd(cmd)
         flg_error = ans[0] == 'E' and ans[1] != 'S'
         if flg_error:
             error_code = int(ans.rsplit(',', 1)[1])
