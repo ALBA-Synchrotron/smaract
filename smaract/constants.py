@@ -55,6 +55,19 @@ class Status(object):
                   9: 'Locked'}
 
 
+class ChannelProperties:
+    EmergencyStop = 16842753
+    EmergencyStopDefault = 16842797
+    LowVibration = 16908289
+    BroadcastStop = 17039361
+    PositionControl = 17104913
+    SensorPowerSupply = 134938625
+    SensorScaleOffset = 135659567
+    SensorScaleInverted = 13569537
+    DigitalIn = 33554433
+    DigitalInEdge = 33554434
+    # TODO: investigate the other properties
+
 class Direction(object):
     """
     Smaract motion constants (Find Reference Mark method).

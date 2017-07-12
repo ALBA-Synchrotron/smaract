@@ -170,8 +170,10 @@ class SmaractMCSController(SmaractBaseController):
     def __init__(self, comm_type, *args):
         SmaractBaseController.__init__(self, comm_type, *args)
 
-        # Configure communication mode
-        mode = 0  # SYNC, the communication library work with acknowledge
+        # Configure communication mode to synchronous
+        # The communication library work with acknowledge
+
+        mode = CommunicationMode.SYNC
         cmd = 'SCM%d' % mode
         self.send_cmd(cmd)
         self._create_axes()

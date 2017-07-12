@@ -213,7 +213,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
         """
         values = []
         for i in range(8):
-            values.append(self.get_table_entry(0, i))
+            values.append(self.get_table_entry(TableIndex.SI, i))
         return values
 
     @step_increment.setter
@@ -234,7 +234,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
             self.set_table_entry(0, values[0], values[1])
         elif len(values) == 8:
             for row, value in enumerate(values):
-                self.set_table_entry(0, row, value)
+                self.set_table_entry(TableIndex.SI, row, value)
         else:
             raise ValueError('The value is not correct. Read the help')
 
@@ -249,7 +249,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
         """
         values = []
         for i in range(8):
-            values.append(self.get_table_entry(0, i))
+            values.append(self.get_table_entry(TableIndex.MF, i))
         return values
 
     @max_closed_loop_frequency.setter
@@ -271,7 +271,7 @@ class SmaractSDCAxis(SmaractBaseAxis):
             self.set_table_entry(0, values[0], values[1])
         elif len(values) == 8:
             for row, value in enumerate(values):
-                self.set_table_entry(0, row, value)
+                self.set_table_entry(TableIndex.MF, row, value)
         else:
             raise ValueError('The value is not correct. Read the help')
 
@@ -509,7 +509,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
     @property
     def emergency_stop(self):
         """
-        Read the emergency stop channel property (16842753).
+        Read the emergency stop channel property.
         0: Normal (default)
         1: Restricted
         2: Disabled
@@ -519,13 +519,12 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        key = 16842753
-        return self.get_channel_property(key)
+        return self.get_channel_property(ChannelProperties.EmergencyStop)
 
     @emergency_stop.setter
     def emergency_stop(self, value):
         """
-        Set the emergency stop channel property (16842753).
+        Set the emergency stop channel property.
         0: Normal (default)
         1: Restricted
         2: Disabled
@@ -536,26 +535,24 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        key = 16842753
-        self.set_channel_property(key, value)
+        self.set_channel_property(ChannelProperties.EmergencyStop, value)
 
     @property
     def low_vibration(self):
         """
-        Read the low vibration channel property (16908289).
+        Read the low vibration channel property.
         0: Disabled (default)
         1: Enabled
         :return: value
 
         Documentation: MCS Manual section 4.4
         """
-        key = 16908289
-        return self.get_channel_property(key)
+        return self.get_channel_property(ChannelProperties.LowVibration)
 
     @low_vibration.setter
     def low_vibration(self, value):
         """
-        Set the low vibration channel property (16908289).
+        Set the low vibration channel property.
         0: Disabled (default)
         1: Enabled
 
@@ -564,26 +561,24 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        key = 16908289
-        self.set_channel_property(key, value)
+        self.set_channel_property(ChannelProperties.LowVibration, value)
 
     @property
     def broadcast_stop(self):
         """
-        Read the broadcast stop channel property (17039361).
+        Read the broadcast stop channel property.
         0: Disabled (default)
         1: Enabled
         :return: value
 
         Documentation: MCS Manual section 4.4
         """
-        key = 17039361
-        return self.get_channel_property(key)
+        return self.get_channel_property(ChannelProperties.BroadcastStop)
 
     @broadcast_stop.setter
     def broadcast_stop(self, value):
         """
-        Set the broadcast stop channel property (17039361).
+        Set the broadcast stop channel property.
         0: Disabled (default)
         1: Enabled
 
@@ -592,54 +587,24 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        key = 17039361
-        self.set_channel_property(key, value)
-
-    @property
-    def broadcast_stop(self):
-        """
-        Read the broadcast stop channel property (17039361).
-        0: Disabled (default)
-        1: Enabled
-        :return: value
-
-        Documentation: MCS Manual section 4.4
-        """
-        key = 17039361
-        return self.get_channel_property(key)
-
-    @broadcast_stop.setter
-    def broadcast_stop(self, value):
-        """
-        Set the broadcast stop channel property (17039361).
-        0: Disabled (default)
-        1: Enabled
-
-        :param value:
-        :return:
-
-        Documentation: MCS Manual section 4.4
-        """
-        key = 17039361
-        self.set_channel_property(key, value)
+        self.set_channel_property(ChannelProperties.BroadcastStop, value)
 
     @property
     def scale_inverted(self):
         """
-        Read the broadcast stop channel property (135659539).
+        Read the broadcast stop channel property.
         0: Normal (default)
         1: Inverted
         :return: value
 
         Documentation: MCS Manual section 4.4
         """
-        key = 135659539
-        return self.get_channel_property(key)
+        return self.get_channel_property(ChannelProperties.SensorScaleInverted)
 
     @scale_inverted.setter
     def scale_inverted(self, value):
         """
-        Set the broadcast stop channel property (135659539).
+        Set the broadcast stop channel property.
         0: Normal (default)
         1: Inverted
 
@@ -648,32 +613,29 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        key = 135659539
-        self.set_channel_property(key, value)
+        self.set_channel_property(ChannelProperties.SensorScaleInverted, value)
 
     @property
     def scale_offset(self):
         """
-        Read the scale offset stop channel property (135659567).
+        Read the scale offset stop channel property.
         :return: value
 
         Documentation: MCS Manual section 4.4
         """
-        key = 135659567
-        return self.get_channel_property(key)
+        return self.get_channel_property(ChannelProperties.SensorScaleOffset)
 
     @scale_offset.setter
     def scale_offset(self, value):
         """
-        Set the scale offset stop channel property (135659567).
+        Set the scale offset stop channel property.
 
         :param value:
         :return:
 
         Documentation: MCS Manual section 4.4
         """
-        key = 135659567
-        self.set_channel_property(key, value)
+        self.set_channel_property(ChannelProperties.SensorScaleOffset, value)
 
     ############################################################################
     #                       Commands
