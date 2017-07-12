@@ -198,10 +198,10 @@ class SmaractSDCAxis(SmaractBaseAxis):
         Documentation: SDC Manual section 3.5
         """
         err_list = list()
-        err, rem = self.get_error_status()
+        err, rem = self.error_status
         err_list.append(err)
         while rem != 0:
-            err, rem = self.get_error_status()
+            err, rem = self.error_status
             err_list.append(err)
         return err_list
 
@@ -327,17 +327,21 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         return [float(x) for x in ans.split(',')[-2:]]
 
     @scale.setter
-    def scale(self, shift, inverted):
+    def scale(self, values):
         """
         Configures the logical scale of the positioner.
         Channel Type: Positioner.
+        Inversion: 0: disabled, 1:enabled
 
-        :param shift: relative shift to the physical scale.
-        :param inverted: scale inversion (0: disabled, 1:enabled).
+        :param values: (scale shift, inverted flag)
         :return: None
 
         Documentation: MCS Manual section 3.2
         """
+        if type(list) not in [tuple, list]:
+            raise ValueError('The value should be a list/tuple read the help.')
+
+        shift, inverted = values
         self._send_cmd('SSC', shift, inverted)
 
     @SmaractBaseAxis.sensor_type.setter
@@ -415,7 +419,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 3.5
         """
-        self._send_cmd('GSN')
+        return self._send_cmd('GSN')
 
     @property
     def firmware_version(self):
