@@ -153,9 +153,6 @@ class SmaractBaseAxis(object):
         """
         self._send_cmd('S')
 
-    # 3.4 - Positioner feedback commands
-    # -------------------------------------------------------------------------
-
 
 class SmaractSDCAxis(SmaractBaseAxis):
     """
@@ -718,6 +715,10 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
 
 class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
+    """
+    Specific class for MCS controllers Rotatory Sensors.
+    """
+
     @property
     def angle_limits(self):
         """
@@ -804,6 +805,9 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
 
 class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
+    """
+    Specific class for MCS controllers Linear Sensors.
+    """
     @property
     def position_limits(self):
         """
