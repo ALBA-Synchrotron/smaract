@@ -202,6 +202,79 @@ class SmaractSDCAxis(SmaractBaseAxis):
             err_list.append(err)
         return err_list
 
+    @property
+    def step_increment(self):
+        """
+        Get the eight step increments from the configuration table
+
+        :return: [0..7] step increments
+
+        Documentation: SDC Manual section 3.5
+        """
+        values = []
+        for i in range(8):
+            values.append(self.get_table_entry(0, i))
+        return values
+
+    @step_increment.setter
+    def step_increment(self, values):
+        """
+        Set the step increments to the configuration table. There are two
+        possibilities to set the values:
+        1) Give two values: [row, value]
+        2) Give the eight values for all rows.
+        :param values: [row,value] or [0..7 values]
+        :return: None
+
+        Documentation: SDC Manual section 3.5
+        """
+        if type(values) not in [tuple, list]:
+            raise ValueError('The value should be a list/tuple. Read the help.')
+        if len(values) == 2:
+            self.set_table_entry(0, values[0], values[1])
+        elif len(values) == 8:
+            for row, value in enumerate(values):
+                self.set_table_entry(0, row, value)
+        else:
+            raise ValueError('The value is not correct. Read the help')
+
+    @property
+    def max_closed_loop_frequency(self):
+        """
+        Get the eight maximum closed loop frequency from the configuration table
+
+        :return: [0..7] max_closed_loop_frequency
+
+        Documentation: SDC Manual section 3.5
+        """
+        values = []
+        for i in range(8):
+            values.append(self.get_table_entry(0, i))
+        return values
+
+    @max_closed_loop_frequency.setter
+    def max_closed_loop_frequency(self, values):
+        """
+        Set the maximum closed loop frequency to the configuration table. There
+        are two possibilities to set the values:
+        1) Give two values: [row, value]
+        2) Give the eight values for all rows.
+        :param values: [row,value] or [0..7 values]
+        :return: None
+
+        Documentation: SDC Manual section 3.5
+        """
+        if type(values) not in [tuple, list]:
+            raise ValueError(
+                'The value should be a list/tuple. Read the help.')
+        if len(values) == 2:
+            self.set_table_entry(0, values[0], values[1])
+        elif len(values) == 8:
+            for row, value in enumerate(values):
+                self.set_table_entry(0, row, value)
+        else:
+            raise ValueError('The value is not correct. Read the help')
+
     ############################################################################
     #                       Commands
     ############################################################################
