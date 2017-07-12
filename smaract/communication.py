@@ -1,6 +1,6 @@
 from serial import Serial
 from socket import socket, AF_INET, SOCK_STREAM
-import PyTango
+
 
 # Define communication protocols
 SERIAL_COM = 1
@@ -54,16 +54,17 @@ class SerialDSCom(object):
     Class which implements the Serial (through TANGO DS Serial) communication
     layer with ASCii interface for Smaract motion controllers.
     """
-    def __init__(self, ds_name):
-        self.ds = PyTango.DeviceProxy(ds_name)
+    def __init__(self, device_name):
+        import PyTango
+        self.device = PyTango.DeviceProxy(device_name)
 
     @comm_error_handler
     def send_cmd(self, cmd):
         # flush both input and output
-        self.ds.DevSerFlush(2)
+        self.device.DevSerFlush(2)
         data = _prepare_cmd(cmd)
-        self.ds.DevSerWriteString(data)
-        ans = _prepare_answer(self.ds.DevSerReadLine())
+        self.device.DevSerWriteString(data)
+        ans = _prepare_answer(self.device.DevSerReadLine())
         return ans
 
 
