@@ -408,7 +408,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 3.2
         """
-        if type(list) not in [tuple, list]:
+        if type(values) not in [tuple, list]:
             raise ValueError('The value should be a list/tuple read the help.')
 
         shift, inverted = values
@@ -816,7 +816,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
         Documentation: MCS Manual section 3.2
         """
-        if type(list) not in [tuple, list]:
+        if type(limits) not in [tuple, list]:
             raise ValueError('The value should be a list/tuple read the help.')
 
         min_angle, min_rev, max_angle, max_rev = limits
@@ -905,7 +905,7 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
 
         Documentation: MCS Manual section 3.2
         """
-        if type(list) not in [tuple, list]:
+        if type(limits) not in [tuple, list]:
             raise ValueError('The value should be a list/tuple read the help.')
 
         min_pos, max_pos = limits
