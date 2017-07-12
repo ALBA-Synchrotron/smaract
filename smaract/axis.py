@@ -28,7 +28,8 @@ class SmaractBaseAxis(object):
 
     # 3.2 - Configuration commands
     # -------------------------------------------------------------------------
-    def get_safe_direction(self):
+    @property
+    def safe_direction(self):
         """
         Gets the current configured safe direction.
         0: forward (FORWARD).
@@ -40,7 +41,8 @@ class SmaractBaseAxis(object):
         ans = self._send_cmd('GSD')
         return int(ans[-1])
 
-    def set_safe_direction(self, direction):
+    @safe_direction.setter
+    def safe_direction(self, direction):
         """
         Sets the current configured safe direction.
         Channel Type: Positioner.
@@ -50,7 +52,8 @@ class SmaractBaseAxis(object):
         """
         self._send_cmd('SSD', direction)
 
-    def get_sensor_type(self):
+    @property
+    def sensor_type(self):
         """
         Gets the type of sensor connected.
         Channel Type: Positioner.
@@ -113,7 +116,8 @@ class SmaractBaseAxis(object):
 
     # 3.4 - Positioner feedback commands
     # -------------------------------------------------------------------------
-    def get_position(self):
+    @property
+    def position(self):
         """
         Gets the current position of a positioner.
         Channel Type: Positioner.
@@ -123,7 +127,8 @@ class SmaractBaseAxis(object):
         ans = self._send_cmd('GP')
         return float(ans.split(',')[1])
 
-    def get_status(self):
+    @property
+    def status(self):
         """
         Get the current movement status of the positioner or end effector.
         Channel Type: Positioner, End Effector.
@@ -141,7 +146,8 @@ class SmaractSDCAxis(SmaractBaseAxis):
 
     # 3.4 - Positioner feedback commands
     # -------------------------------------------------------------------------
-    def get_target_position(self):
+    @property
+    def target_position(self):
         """
         Gets the current target position (working as slave).
         Channel Type: Positioner.
@@ -153,7 +159,8 @@ class SmaractSDCAxis(SmaractBaseAxis):
 
     # 3.5 - Miscellaneous commands
     # -------------------------------------------------------------------------
-    def get_error_status(self):
+    @property
+    def error_status(self):
         """
         Gets the latest error code.
         Channel Type: Positioner.
@@ -163,7 +170,8 @@ class SmaractSDCAxis(SmaractBaseAxis):
         ans = self._send_cmd('GES')
         return int(ans.split(',')[1, 2])
 
-    def get_error_queue(self):
+    @property
+    def error_queue(self):
         """
         Gets all error in queue.
         Channel Type: Positioner.
@@ -213,7 +221,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------
-    def get_channel_type(self):
+    @property
+    def channel_type(self):
         """
         Gets the type of channel.
         0: Positioner
@@ -226,7 +235,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
     # 3.2 - Configuration commands
     # -------------------------------------------------------------------------
-    def get_closed_loop_acc(self):
+    @property
+    def closed_loop_acc(self):
         """
         Gets acceleration value used for closed-loop commands.
         Channel Type: Positioner.
@@ -236,7 +246,20 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GCLA')
         return float(ans.split(',')[1])
 
-    def get_closed_loop_vel(self):
+    @closed_loop_acc.setter
+    def closed_loop_acc(self, acceleration):
+        """
+        Sets acceleration value used for closed-loop commands.
+        Channel Type: Positioner.
+
+        :param acceleration: value
+        :return: None
+        """
+        is_acceleration_in_range(acceleration)
+        self._send_cmd(('SCLA', acceleration))
+
+    @property
+    def closed_loop_vel(self):
         """
         Gets velocity value used for closed-loop commands.
         Channel Type: Positioner.
@@ -245,6 +268,52 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         ans = self._send_cmd('GCLS')
         return float(ans.split(',')[1])
+
+    @closed_loop_vel.setter
+    def closed_loop_vel(self, velocity):
+        """
+        Sets velocity value used for closed-loop commands.
+        Channel Type: Positioner.
+
+        :param velocity: valocity value
+        :return: None
+        """
+        is_velocity_in_range(velocity)
+        self._send_cmd(('SCLS', velocity))
+
+    @property
+    def scale(self):
+        """
+        Gets the current configured scale shift and if this is inverted.
+        Channel Type: Positioner.
+
+        :return: (scale shift, inverted flag)
+        """
+        ans = self._send_cmd('GSC')
+        return [float(x) for x in ans.split(',')[-2:]]
+
+    @scale.setter
+    def scale(self, shift, inverted):
+        """
+        Configures the logical scale of the positioner.
+        Channel Type: Positioner.
+
+        :param shift: relative shift to the physical scale.
+        :param inverted: scale inversion (0: disabled, 1:enabled).
+        :return: None
+        """
+        self._send_cmd('SSC', shift, inverted)
+
+    @SmaractBaseAxis.sensor_type.setter
+    def sensor_type(self, sensor_type):
+        """
+        Set the type of positioner attach to a channel.
+        Channel Type: Positioner.
+
+        :param sensor_type: sensor type code.
+        :return: None
+        """
+        self._send_cmd('SST', sensor_type)
 
     def get_channel_property(self, key):
         """
@@ -268,16 +337,6 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GEET')
         return [int(x) for x in ans.split(',')[-3:]]
 
-    def get_scale(self):
-        """
-        Gets the current configured scale shift and if this is inverted.
-        Channel Type: Positioner.
-
-        :return: (scale shift, inverted flag)
-        """
-        ans = self._send_cmd('GSC')
-        return [float(x) for x in ans.split(',')[-2:]]
-
     def set_accumulate_rel_pos(self, enable=1):
         """
         Accumulate relative position command if is issued before finishing the
@@ -289,17 +348,6 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         self._send_cmd('SARP', enable)
 
-    def set_closed_loop_acc(self, acceleration):
-        """
-        Sets acceleration value used for closed-loop commands.
-        Channel Type: Positioner.
-
-        :param acceleration: value
-        :return: None
-        """
-        is_acceleration_in_range(acceleration)
-        self._send_cmd(('SCLA', acceleration))
-
     def set_closed_loop_max_freq(self, frequency):
         """
         Sets frequency value used for closed-loop commands.
@@ -310,17 +358,6 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         is_frequency_in_range(frequency)
         self._send_cmd('SCLF', frequency)
-
-    def set_closed_loop_vel(self, velocity):
-        """
-        Sets velocity value used for closed-loop commands.
-        Channel Type: Positioner.
-
-        :param velocity: valocity value
-        :return: None
-        """
-        is_velocity_in_range(velocity)
-        self._send_cmd(('SCLS', velocity))
 
     def set_channel_property(self, key, value):
         """
@@ -376,27 +413,6 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         :return: None
         """
         self._send_cmd('SRT', enable)
-
-    def set_scale(self, shift, inverted):
-        """
-        Configures the logical scale of the positioner.
-        Channel Type: Positioner.
-
-        :param shift: relative shift to the physical scale.
-        :param inverted: scale inversion (0: disabled, 1:enabled).
-        :return: None
-        """
-        self._send_cmd('SSC', shift, inverted)
-
-    def set_sensor_type(self, sensor_type):
-        """
-        Set the type of positioner attach to a channel.
-        Channel Type: Positioner.
-
-        :param sensor_type: sensor type code.
-        :return: None
-        """
-        self._send_cmd('SST', sensor_type)
 
     def set_step_while_scan(self, enable=1):
         """
@@ -525,7 +541,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GB', buffer_idx)
         return [float(x) for x in ans.split(',')[2:]]
 
-    def get_force(self):
+    @property
+    def force(self):
         """
         Request the force measured by the sensor connected to the End Effector.
         Channel Type: End Effector.
@@ -535,7 +552,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GF')
         return float(ans.split(',')[-1])
 
-    def get_gripper_opening(self):
+    @property
+    def gripper_opening(self):
         """
         Request the voltage currently applied to the gripper.
         Channel Type: End Effector.
@@ -545,7 +563,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GGO')
         return float(ans.split(',')[-1])
 
-    def get_physical_position_known(self):
+    @property
+    def physical_position_known(self):
         """
         Returns whether the physical position is known.
         Channel Type: Positioner.
@@ -555,7 +574,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GPPK')
         return int(ans.split(',')[1])
 
-    def get_voltage_level(self):
+    @property
+    def voltage_level(self):
         """
         Returns the voltage level which is currently applied to a positioner.
         Channel Type: Positioner.
@@ -567,7 +587,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
     # 3.5 - Miscellaneous commands
     # -------------------------------------------------------------------------
-    def get_serial_number(self):
+    @property
+    def serial_number(self):
         """
         Retrieves the serial number of the channel.
         Channel Type: Positioner, End Effector.
@@ -576,7 +597,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         self._send_cmd('GSN')
 
-    def get_firmware_version(self):
+    @property
+    def firmware_version(self):
         """
         Retrieves the firmware version of the channel.
         Channel Type: Positioner, End Effector.
@@ -608,7 +630,8 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
     # 3.2 - Configuration commands
     # -------------------------------------------------------------------------
-    def get_angle_limit(self):
+    @property
+    def angle_limits(self):
         """
         Gets the travel range limit currently configured for a rotatory channel.
         Channel Type: Positioner.
@@ -618,17 +641,19 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         ans = self._send_cmd('GAL')
         return [float(x) for x in ans.split(',')[-4:]]
 
-    def set_angle_limit(self, min_angle, min_rev, max_angle, max_rev):
+    @angle_limits.setter
+    def angle_limits(self, limits):
         """
         Sets the travel range limit currently configured for a rotatory channel.
         Channel Type: Positioner.
 
-        :param min_angle: minimum angle value.
-        :param min_rev: minimum revolutions value.
-        :param max_angle: maximum angle value.
-        :param max_rev: maximum revolutions value.
+        :param limits: (minAngle, minRev, maxAngle, maxRev)
         :return: None
         """
+        if type(list) not in [tuple, list]:
+            raise ValueError('The value should be a list/tuple read the help.')
+
+        min_angle, min_rev, max_angle, max_rev = limits
         is_angle_in_range([min_angle, max_angle])
         is_revolution_in_range([min_rev, max_rev])
         self._send_cmd('SAL', min_angle, min_rev, max_angle, max_rev)
@@ -666,7 +691,8 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
     # 3.4 - Positioner feedback commands
     # -------------------------------------------------------------------------
-    def get_angle(self):
+    @property
+    def angle(self):
         """
         Request the current angle of a positioner.
         Channel Type: Positioner.
@@ -680,18 +706,8 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
 class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
 
-    def set_position_limit(self, min_pos, max_pos):
-        """
-        Sets the travel range limit currently configured for a linear channel.
-        Channel Type: Positioner.
-
-        :param min_pos: minimum position.
-        :param max_pos: maximum position.
-        :return: None
-        """
-        self._send_cmd('SPL', min_pos, max_pos)
-
-    def get_position_limit(self):
+    @property
+    def position_limits(self):
         """
         Gets the travel range limit currently configured for a linear channel.
         Channel Type: Positioner.
@@ -700,6 +716,21 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
         """
         ans = self._send_cmd('GPL')
         return [float(x) for x in ans.split(',')[-2:]]
+
+    @position_limits.setter
+    def position_limits(self, limits):
+        """
+        Sets the travel range limit currently configured for a linear channel.
+        Channel Type: Positioner.
+
+        :param limits: (min position, max_position)
+        :return: None
+        """
+        if type(list) not in [tuple, list]:
+            raise ValueError('The value should be a list/tuple read the help.')
+
+        min_pos, max_pos = limits
+        self._send_cmd('SPL', min_pos, max_pos)
 
     def move_position_absolute(self, position, hold_time=0):
         """
