@@ -9,6 +9,7 @@ long_description = """ Python library to control the Smaract Controller:
 SDC and MCS. The library provide a friendly API to configure and to use the
 controllers and the motors connected to them. """
 
+# TODO: Include documentation.
 
 classifiers = [
     # How mature is this project? Common values are
