@@ -9,9 +9,9 @@ class SmaractBaseAxis(object):
     at the axis level. The _send_cmd function wrappers the current controller
     _send_cmd method.
     """
-    def __init__(self, parent, axis_nr=0):
+    def __init__(self, ctrl, axis_nr=0):
         self._axis_nr = axis_nr
-        self._parent = weakref.ref(parent)
+        self._ctrl = weakref.ref(ctrl)
 
     def _send_cmd(self, str_cmd, *pars):
         """
@@ -24,7 +24,7 @@ class SmaractBaseAxis(object):
         """
         str_cmd = "%s%d" % (str_cmd, self._axis_nr)
         cmd = "%s" % (str_cmd + "".join([",%d" % i for i in pars]))
-        return self._parent.send_cmd(cmd)
+        return self._ctrl.send_cmd(cmd)
 
     @property
     def safe_direction(self):
@@ -66,7 +66,7 @@ class SmaractBaseAxis(object):
         """
         ans = self._send_cmd('GST')
         sensor_code = int(ans.rsplit(',', 1)[1])
-        return self._parent.SENSOR_CODE[sensor_code]
+        return self._ctrl.SENSOR_CODE[sensor_code]
 
     @property
     def position(self):
