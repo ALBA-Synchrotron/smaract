@@ -396,6 +396,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GSC')
         return [float(x) for x in ans.split(',')[-2:]]
 
+    # TODO: analyze if it is enough with the channel properties.
     @scale.setter
     def scale(self, values):
         """
@@ -504,6 +505,175 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         ans = self._send_cmd('GFV')
         # TODO: create human-readable string for return
         return ans.split(',')[1:]
+
+    @property
+    def emergency_stop(self):
+        """
+        Read the emergency stop channel property (16842753).
+        0: Normal (default)
+        1: Restricted
+        2: Disabled
+        3: Auto Release
+
+        :return: value
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 16842753
+        return self.get_channel_property(key)
+
+    @emergency_stop.setter
+    def emergency_stop(self, value):
+        """
+        Set the emergency stop channel property (16842753).
+        0: Normal (default)
+        1: Restricted
+        2: Disabled
+        3: Auto Release
+
+        :param value:
+        :return:
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 16842753
+        self.set_channel_property(key, value)
+
+    @property
+    def low_vibration(self):
+        """
+        Read the low vibration channel property (16908289).
+        0: Disabled (default)
+        1: Enabled
+        :return: value
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 16908289
+        return self.get_channel_property(key)
+
+    @low_vibration.setter
+    def low_vibration(self, value):
+        """
+        Set the low vibration channel property (16908289).
+        0: Disabled (default)
+        1: Enabled
+
+        :param value:
+        :return:
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 16908289
+        self.set_channel_property(key, value)
+
+    @property
+    def broadcast_stop(self):
+        """
+        Read the broadcast stop channel property (17039361).
+        0: Disabled (default)
+        1: Enabled
+        :return: value
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 17039361
+        return self.get_channel_property(key)
+
+    @broadcast_stop.setter
+    def broadcast_stop(self, value):
+        """
+        Set the broadcast stop channel property (17039361).
+        0: Disabled (default)
+        1: Enabled
+
+        :param value:
+        :return:
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 17039361
+        self.set_channel_property(key, value)
+
+    @property
+    def broadcast_stop(self):
+        """
+        Read the broadcast stop channel property (17039361).
+        0: Disabled (default)
+        1: Enabled
+        :return: value
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 17039361
+        return self.get_channel_property(key)
+
+    @broadcast_stop.setter
+    def broadcast_stop(self, value):
+        """
+        Set the broadcast stop channel property (17039361).
+        0: Disabled (default)
+        1: Enabled
+
+        :param value:
+        :return:
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 17039361
+        self.set_channel_property(key, value)
+
+    @property
+    def scale_inverted(self):
+        """
+        Read the broadcast stop channel property (135659539).
+        0: Normal (default)
+        1: Inverted
+        :return: value
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 135659539
+        return self.get_channel_property(key)
+
+    @scale_inverted.setter
+    def scale_inverted(self, value):
+        """
+        Set the broadcast stop channel property (135659539).
+        0: Normal (default)
+        1: Inverted
+
+        :param value:
+        :return:
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 135659539
+        self.set_channel_property(key, value)
+
+    @property
+    def scale_offset(self):
+        """
+        Read the scale offset stop channel property (135659567).
+        :return: value
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 135659567
+        return self.get_channel_property(key)
+
+    @scale_offset.setter
+    def scale_offset(self, value):
+        """
+        Set the scale offset stop channel property (135659567).
+
+        :param value:
+        :return:
+
+        Documentation: MCS Manual section 4.4
+        """
+        key = 135659567
+        self.set_channel_property(key, value)
 
     ############################################################################
     #                       Commands
