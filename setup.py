@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 # The version is updated automatically with bumpversion
 # Do not update manually
-__version = '0.1.0-alpha'
+__version = '0.2.0-alpha'
 
 
 long_description = """ Python library to control the Smaract Controller:
