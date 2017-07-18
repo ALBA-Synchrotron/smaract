@@ -144,7 +144,7 @@ def is_angle_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_ANGLE <= value <= MAX_ANGLE):
             msg = 'Valid angle range: [%d, %d] s' %\
@@ -159,7 +159,7 @@ def is_angle_relative_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (-MAX_ANGLE <= value <= MAX_ANGLE):
             msg = 'Valid relative angle range: [%d, %d] s' %\
@@ -174,7 +174,7 @@ def is_acceleration_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (0 <= value <= MAX_ACCELERATION):
             msg = 'Valid acceleration range: [0,%d] um/s^2' %\
@@ -189,7 +189,7 @@ def is_revolution_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_REV <= value <= MAX_REV):
             msg = 'Valid revolution range: [%d, %d] s' %\
@@ -204,7 +204,7 @@ def is_steps_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = (values)
     for value in values:
         if abs(value) > MAX_STEPS or value == 0:
             msg = 'Valid step range is [-%d, %d]' % (MAX_STEPS, MAX_STEPS)
@@ -218,7 +218,7 @@ def is_amplitude_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if value < 0 or value > MAX_AMPLITUDE:
             msg = 'Valid amplitude range is (0, %d)' % MAX_AMPLITUDE
@@ -232,7 +232,7 @@ def is_frequency_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if value < 0 or value > MAX_FREQUENCY:
             msg = 'Valid frequency range is (0, %d]' % MAX_FREQUENCY
@@ -246,7 +246,7 @@ def is_velocity_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (0 <= value <= MAX_VELOCITY):
             msg = 'Valid velocity range: [0,%d] nm/s' % MAX_VELOCITY
@@ -260,7 +260,7 @@ def is_speed_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_SPEED <= value <= MAX_SPEED):
             msg = 'Valid speed range: [%d,%d] Volts/s' % (MIN_SPEED, MAX_SPEED)
@@ -274,7 +274,7 @@ def is_force_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_FORCE <= value <= MAX_FORCE):
             msg = 'Valid force range: [%d,%d] 10 x uN' % (MIN_FORCE, MAX_FORCE)
@@ -288,7 +288,7 @@ def is_opening_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_OPENING <= value <= MAX_OPENING):
             msg = 'Valid opening range: [%d,%d] 1/100 Volts' %\
@@ -303,7 +303,7 @@ def is_opening_relative_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (-MAX_OPENING <= value <= MAX_OPENING):
             msg = 'Valid relative opening range: [%d,%d] 1/100 Volts' %\
@@ -318,7 +318,7 @@ def is_target_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_TARGET <= value <= MAX_TARGET):
             msg = 'Valid target range: [%d,%d] (12-bit)' %\
@@ -333,7 +333,7 @@ def is_target_relative_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (-MAX_TARGET <= value <= MAX_TARGET):
             msg = 'Valid relative target range: [%d,%d] (12-bit)' % \
@@ -348,7 +348,7 @@ def is_scan_speed_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_SCAN_SPEED <= value <= MAX_SCAN_SPEED):
             msg = 'Valid scan speed range: [%d,%d] (12-bit/s)' %\
@@ -363,7 +363,7 @@ def is_trigger_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_TRIGGER <= value <= MAX_TRIGGER):
             msg = 'Valid trigger range: [%d,%d]' %\
@@ -378,7 +378,7 @@ def is_baudrate_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_BAUDRATE <= value <= MAX_BAUDRATE):
             msg = 'Valid baudrate range: [%d,%d]' %\
@@ -393,7 +393,7 @@ def is_delay_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_DELAY <= value <= MAX_DELAY):
             msg = 'Valid delay range: [%d,%d] ms' %\
@@ -408,7 +408,7 @@ def is_row_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if value < 0 or value > 7:
             raise ValueError('Valid row range is [0,7]')
@@ -421,7 +421,7 @@ def is_hold_time_in_range(values):
     :return: None
     """
     if type(values) is not list:
-        values = list(values)
+        values = [values]
     for value in values:
         if not (MIN_HOLD_TIME <= value <= MAX_HOLD_TIME):
             msg = 'Valid hold time range: [%d,%d] ms' %\
