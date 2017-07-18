@@ -63,7 +63,7 @@ class ChannelProperties:
     PositionControl = 17104913
     SensorPowerSupply = 134938625
     SensorScaleOffset = 135659567
-    SensorScaleInverted = 13569537
+    SensorScaleInverted = 135659539
     DigitalIn = 33554433
     DigitalInEdge = 33554434
     # TODO: investigate the other properties

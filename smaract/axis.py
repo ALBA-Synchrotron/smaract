@@ -682,7 +682,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 3.2
         """
-        ans = self._send_cmd('GCLS', key)
+        ans = self._send_cmd('GCP', key)
         return int(ans.split(',')[-1])
 
     def get_end_effector_type(self):
