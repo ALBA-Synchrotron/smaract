@@ -924,6 +924,19 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
     """
     Specific class for MCS controllers Rotatory Sensors.
     """
+    @property
+    def position(self):
+        """
+        Gets the current position of a positioner.
+        Channel Type: Positioner.
+
+        :return: current positioner position.
+
+        Documentation: MCS Manual section 3.4
+        """
+        ans = self._send_cmd('GA')
+        return float(ans.split(',')[1])
+
 
     @property
     def angle_limits(self):
