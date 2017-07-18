@@ -104,10 +104,14 @@ class SmaractBaseController(list):
         if flg_error:
             error_code = int(ans.rsplit(',', 1)[1])
             if error_code != 0:
-                error_msg = ('Error %d: %s' % (error_code,
-                                               self.ERROR_CODES[
-                                                   error_code]))
-                raise RuntimeError(error_msg)
+                if error_code in self.ERROR_CODES:
+                    error_msg = self.ERROR_CODES[error_code]
+                else:
+                    error_msg = 'There is not message for this error on ' + \
+                        'the documentation'
+                msg = ('Error %d: %s' % (error_code, error_msg))
+                                                   
+                raise RuntimeError(msg)
         return ans
 
     # 3.1 - Initialization commands
