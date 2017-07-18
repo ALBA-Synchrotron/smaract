@@ -11,8 +11,9 @@ class SmaractBaseAxis(object):
     """
     def __init__(self, ctrl, axis_nr=0):
         self._axis_nr = axis_nr
-        self._ctrl = weakref.ref(ctrl)
-
+        ref = weakref.ref(ctrl)
+        self._ctrl = ref()
+        
     def _send_cmd(self, str_cmd, *pars):
         """
         Send command function used to retrieve controller information at the

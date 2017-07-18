@@ -177,7 +177,7 @@ class SmaractMCSController(SmaractBaseController):
         cmd = 'SCM%d' % mode
         self.send_cmd(cmd)
         self._create_axes()
-
+        
     def _create_axes(self):
         try:
             while True:
@@ -186,7 +186,7 @@ class SmaractMCSController(SmaractBaseController):
             pass
 
         for axis_nr in range(self.nchannels):
-            ans = self.send_cmd('GST')
+            ans = self.send_cmd('GST%d' % axis_nr)
             sensor_code = int(ans.rsplit(',', 1)[1])
             if sensor_code in self.LINEAR_SENSORS:
                 axis = SmaractMCSLinearAxis(self, axis_nr)
