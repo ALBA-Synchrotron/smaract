@@ -538,31 +538,32 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         self.set_channel_property(ChannelProperties.EmergencyStop, value)
 
-    @property
-    def low_vibration(self):
-        """
-        Read the low vibration channel property.
-        0: Disabled (default)
-        1: Enabled
-        :return: value
+# TODO: Investigate why it raises error 157  
+    # @property
+#     def low_vibration(self):
+#         """
+#         Read the low vibration channel property.
+#         0: Disabled (default)
+#         1: Enabled
+#         :return: value
 
-        Documentation: MCS Manual section 4.4
-        """
-        return self.get_channel_property(ChannelProperties.LowVibration)
+#         Documentation: MCS Manual section 4.4
+#         """
+#         return self.get_channel_property(ChannelProperties.LowVibration)
 
-    @low_vibration.setter
-    def low_vibration(self, value):
-        """
-        Set the low vibration channel property.
-        0: Disabled (default)
-        1: Enabled
+#     @low_vibration.setter
+#     def low_vibration(self, value):
+#         """
+#         Set the low vibration channel property.
+#         0: Disabled (default)
+#         1: Enabled
 
-        :param value:
-        :return:
+#         :param value:
+#         :return:
 
-        Documentation: MCS Manual section 4.4
-        """
-        self.set_channel_property(ChannelProperties.LowVibration, value)
+#         Documentation: MCS Manual section 4.4
+#         """
+#         self.set_channel_property(ChannelProperties.LowVibration, value)
 
     @property
     def broadcast_stop(self):
