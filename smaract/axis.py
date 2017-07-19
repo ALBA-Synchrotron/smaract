@@ -40,7 +40,9 @@ class SmaractBaseAxis(object):
         Documentation: MCS Manual section 3.2
         """
         ans = self._send_cmd('GSD')
-        return int(ans[-1])
+        direction = int(ans[-1])
+        result = ['forward', 'backward'][direction]
+        return result
 
     @safe_direction.setter
     def safe_direction(self, direction):
@@ -48,12 +50,19 @@ class SmaractBaseAxis(object):
         Sets the current configured safe direction.
         Channel Type: Positioner.
 
-        :param direction: either 0 (forward) or 1 (backward).
+        :param direction: either forward(0) or backward(0).
         :return: None
 
         Documentation: MCS Manual section 3.2
         """
-        self._send_cmd('SSD', direction)
+        direction = direction.lower()
+        if direction == 'forward':
+            value = 0
+        elif direction == 'backward':
+            value = 1
+        else:
+            raise ValueError('Read the help')
+        self._send_cmd('SSD', value)
 
     @property
     def sensor_type(self):
