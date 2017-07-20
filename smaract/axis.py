@@ -107,6 +107,14 @@ class SmaractBaseAxis(object):
     ############################################################################
     #                       Commands
     ############################################################################
+    def move(self, position):
+        """
+        Abstract method
+        :param position: absolute position
+        :return:
+        """
+        raise NotImplemented('The method should be implement')
+
     def calibrate_sensor(self):
         """
         Increase the accuracy of the position calculation.
@@ -1002,6 +1010,16 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
     ############################################################################
     #                       Commands
     ############################################################################
+    def move(self, position):
+        """
+        Move method
+        :param position: the position is the absolute total angle
+        :return:
+        """
+        angle = int(position % 360)
+        revolutions = int(position / 360)
+        self.move_angle_absolute(angle, revolutions)
+
     def move_angle_absolute(self, angle, rev, hold_time=0):
         """
         Instructs the positioner to turn to a specific angle value.
@@ -1075,6 +1093,14 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
     ############################################################################
     #                       Commands
     ############################################################################
+    def move(self, position):
+        """
+        Move method
+        :param position: the position is the absolute total angle
+        :return:
+        """
+        self.move_position_absolute(position)
+
     def move_position_absolute(self, position, hold_time=0):
         """
         Instructs the positioner to move to a specific position value.
