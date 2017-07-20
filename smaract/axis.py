@@ -488,7 +488,9 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         Documentation: MCS Manual section 3.4
         """
         ans = self._send_cmd('GVL')
-        return float(ans.split(',')[-1])
+        raw_data = float(ans.split(',')[-1])
+        voltage = (raw_data * 100) / 4095
+        return voltage
 
     @property
     def serial_number(self):
