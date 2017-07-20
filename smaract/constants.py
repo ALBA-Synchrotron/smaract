@@ -44,7 +44,7 @@ class Status(object):
     HOMING = 7
     LOCKED = 9
 
-    status_txt = {0: 'Stopped',
+    states_txt = {0: 'Stopped',
                   1: 'Stepping',
                   2: 'Scanning',
                   3: 'Holding',
@@ -53,6 +53,23 @@ class Status(object):
                   6: 'Calibrating',
                   7: 'Finding reference mark',
                   9: 'Locked'}
+    
+    status_txt = {0: 'The positioner is currently not performing active ' 
+                     'movement.',
+                  1: 'The positioner is performing an open-loop movement.',
+                  2: 'The positioner is performing a scanning movement.',
+                  3: 'The positioner is holding its current target position '
+                     'or is holding the reference mark',
+                  4: 'The positioner is performing a close-loop movement.',
+                  5: 'The positioner is currently waiting for the sensor to '
+                      'power up before executing the movement command. This '
+                      'status may be returned if the sensors are operated '
+                      ' in power save mode.',
+                  6: 'The positioner is buusy calibrating its sensor.',
+                  7: 'The positioner is moving to find the reference mark.',
+                  9: 'An emergency stop has occurred and futher movements '
+                     'are not allowed.'
+                  }
 
 
 class ChannelProperties:

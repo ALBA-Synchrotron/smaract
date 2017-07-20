@@ -92,7 +92,7 @@ class SmaractBaseAxis(object):
         return float(ans.split(',')[1])
 
     @property
-    def status(self):
+    def state(self):
         """
         Get the current movement status of the positioner or end effector.
         Channel Type: Positioner, End Effector.
@@ -102,7 +102,22 @@ class SmaractBaseAxis(object):
         Documentation: MCS Manual section 3.4
         """
         ans = self._send_cmd('GS')
-        return int(ans.split(',')[1])
+        return int(ans.split(',')[1]) 
+
+    @property
+    def status(self):
+        """
+        Get the current state, state msg and status of the positioner
+
+        :return: channel status code, state msg and status.
+
+        Documentation: MCS Manual section 3.4
+        """
+
+        state_code = self.state 
+        state_msg = Status.states_txt[state_code]
+        status = Status.status_txt[state_code]
+        return state_code, state_msg, status
 
     ############################################################################
     #                       Commands
