@@ -960,13 +960,13 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         Gets the current position of a positioner.
         Channel Type: Positioner.
 
-        :return: current positioner position.
+        :return: current positioner position in degree.
 
         Documentation: MCS Manual section 3.4
         """
         ans = self._send_cmd('GA')
         angle, revolution = [float(x) for x in ans.split(',')[-2:]]
-        position = (revolution * 360) + angle
+        position = (revolution * 360) + (angle * 1e-6)
         return position
 
     @property
@@ -982,8 +982,8 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         ans = self._send_cmd('GAL')
         # Answer (minAngle, minRev, maxAngle, maxRev)
         values = [float(x) for x in ans.split(',')[-4:]]
-        min_angle = (values[1] * 360) + values[0]
-        max_angle = (values[3] * 360) + values[2]
+        min_angle = (values[1] * 360) + (values[0] * 1e-6)
+        max_angle = (values[3] * 360) + (values[2] * 1e-6)
         return [min_angle, max_angle]
 
     @position_limits.setter
@@ -1003,7 +1003,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
         values = []
         for limit in limits:
-            values.append(int(limit % 360))  # angle
+            values.append(int((limit % 360) * 1e6))  # angle
             values.append(int(limit / 360))  # revolution
         self._send_cmd('SAL', *values)
 
@@ -1016,7 +1016,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         :param position: the position is the absolute total angle
         :return:
         """
-        angle = abs(int(position % 360))
+        angle = abs(int((position % 360) * 1e6))
         revolutions = int(position / 360)
         self.move_angle_absolute(angle, revolutions)
 
