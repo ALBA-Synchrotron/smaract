@@ -981,7 +981,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         """
         ans = self._send_cmd('GAL')
         # Answer (minAngle, minRev, maxAngle, maxRev)
-        values = [float(x) for x in ans.split(',')[-2:]]
+        values = [float(x) for x in ans.split(',')[-4:]]
         min_angle = (values[1] * 360) + values[0]
         max_angle = (values[3] * 360) + values[2]
         return [min_angle, max_angle]
