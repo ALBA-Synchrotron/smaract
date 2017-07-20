@@ -593,7 +593,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        return self.get_channel_property(ChannelProperties.BroadcastStop)
+
+        return bool(self.get_channel_property(ChannelProperties.BroadcastStop))
 
     @broadcast_stop.setter
     def broadcast_stop(self, value):
@@ -607,7 +608,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        self.set_channel_property(ChannelProperties.BroadcastStop, value)
+        self.set_channel_property(ChannelProperties.BroadcastStop, int(value))
 
     @property
     def scale_inverted(self):
