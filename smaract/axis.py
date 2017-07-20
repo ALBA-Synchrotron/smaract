@@ -1016,7 +1016,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         :param position: the position is the absolute total angle
         :return:
         """
-        angle = int(position % 360)
+        angle = abs(int(position % 360))
         revolutions = int(position / 360)
         self.move_angle_absolute(angle, revolutions)
 
