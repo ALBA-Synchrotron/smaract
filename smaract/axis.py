@@ -620,7 +620,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        return self.get_channel_property(ChannelProperties.SensorScaleInverted)
+        return bool(self.get_channel_property(
+            ChannelProperties.SensorScaleInverted))
 
     @scale_inverted.setter
     def scale_inverted(self, value):
@@ -634,7 +635,8 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        self.set_channel_property(ChannelProperties.SensorScaleInverted, value)
+        self.set_channel_property(ChannelProperties.SensorScaleInverted,
+                                  int(value))
 
     @property
     def scale_offset(self):
