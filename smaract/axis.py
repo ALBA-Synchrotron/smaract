@@ -613,7 +613,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
     @property
     def scale_inverted(self):
         """
-        Read the broadcast stop channel property.
+        Read the scale inverted channel property.
         0: Normal (default)
         1: Inverted
         :return: value
@@ -626,7 +626,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
     @scale_inverted.setter
     def scale_inverted(self, value):
         """
-        Set the broadcast stop channel property.
+        Set the scale inverted channel property.
         0: Normal (default)
         1: Inverted
 
