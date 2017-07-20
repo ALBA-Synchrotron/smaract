@@ -531,7 +531,9 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
 
         Documentation: MCS Manual section 4.4
         """
-        return self.get_channel_property(ChannelProperties.EmergencyStop)
+        value = self.get_channel_property(ChannelProperties.EmergencyStop)
+
+        return ['Normal', 'Restricted', 'Desabled', 'AutoRelease'][value]
 
     @emergency_stop.setter
     def emergency_stop(self, value):
@@ -540,14 +542,19 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         0: Normal (default)
         1: Restricted
         2: Disabled
-        3: Auto Release
+        3: AutoRelease
 
         :param value:
         :return:
 
         Documentation: MCS Manual section 4.4
         """
-        self.set_channel_property(ChannelProperties.EmergencyStop, value)
+        value = value.lower()
+        valid_values = ['normal', 'restricted', 'desabled', 'autorelease']
+        if value not in valid_values:
+            raise ValueError('Wrong value. Valid values: %r' % valid_values)
+        idx = valid_values.index(value)
+        self.set_channel_property(ChannelProperties.EmergencyStop, idx)
 
 # TODO: Investigate why it raises error 157  
     # @property
