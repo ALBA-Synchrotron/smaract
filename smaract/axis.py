@@ -957,54 +957,47 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         Documentation: MCS Manual section 3.4
         """
         ans = self._send_cmd('GA')
-        return float(ans.split(',')[1])
-
+        angle, revolution = [float(x) for x in ans.split(',')[-2:]]
+        position = (revolution * 360) + angle
+        return position
 
     @property
-    def angle_limits(self):
+    def position_limits(self):
         """
-        Gets the travel range limit currently configured for a rotatory channel.
+        Gets the travel range limit currently configured for the channel.
         Channel Type: Positioner.
 
-        :return: (minAngle, minRev, maxAngle, maxRev)
+        :return: (min position, max_position)
 
         Documentation: MCS Manual section 3.2
         """
         ans = self._send_cmd('GAL')
-        return [float(x) for x in ans.split(',')[-4:]]
+        # Answer (minAngle, minRev, maxAngle, maxRev)
+        values = [float(x) for x in ans.split(',')[-2:]]
+        min_angle = (values[1] * 360) + values[0]
+        max_angle = (values[3] * 360) + values[2]
+        return [min_angle, max_angle]
 
-    @angle_limits.setter
-    def angle_limits(self, limits):
+    @position_limits.setter
+    def position_limits(self, limits):
         """
-        Sets the travel range limit currently configured for a rotatory channel.
+        Sets the travel range limit currently configured.
         Channel Type: Positioner.
 
-        :param limits: (minAngle, minRev, maxAngle, maxRev)
+        :param limits: (min_position, max_position)
         :return: None
 
         Documentation: MCS Manual section 3.2
         """
+
         if type(limits) not in [tuple, list]:
             raise ValueError('The value should be a list/tuple read the help.')
 
-        min_angle, min_rev, max_angle, max_rev = limits
-        is_angle_in_range([min_angle, max_angle])
-        is_revolution_in_range([min_rev, max_rev])
-        self._send_cmd('SAL', min_angle, min_rev, max_angle, max_rev)
-
-    @property
-    def angle(self):
-        """
-        Request the current angle of a positioner.
-        Channel Type: Positioner.
-
-        :return: (angle, revolution) in udeg.
-
-        Documentation: MCS Manual section 3.4
-        """
-        ans = self._send_cmd('GA')
-        # TODO: convert tuple (angle, rev) to angle.
-        return [float(x) for x in ans.split(',')[-2:]]
+        values = []
+        for limit in limits:
+            values.append(int(limit % 360))  # angle
+            values.append(int(limit / 360))  # revolution
+        self._send_cmd('SAL', *values)
 
     ############################################################################
     #                       Commands
