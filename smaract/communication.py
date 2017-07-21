@@ -82,9 +82,13 @@ class SocketCom(socket):
     """
     def __init__(self, host='localhost', port=5000, timeout=3.0):
         super(SocketCom, self).__init__(family=AF_INET, type=SOCK_STREAM)
-        self.connect((host, port))
         self.settimeout(timeout)
-
+        try:
+            self.connect((host, port))
+        except Exception as e:
+            raise RuntimeError('There are problem to connect to the smaract. '
+                               'Maybe there is another client connected. '
+                               'Error: %s' % e)
     @comm_error_handler
     def send_cmd(self, cmd):
         self.sendall(cmd)
