@@ -387,7 +387,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         Documentation: MCS Manual section 3.2
         """
         is_acceleration_in_range(acceleration)
-        self._send_cmd(('SCLA', acceleration))
+        self._send_cmd('SCLA', acceleration)
 
     @property
     def closed_loop_vel(self):
@@ -414,7 +414,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         Documentation: MCS Manual section 3.2
         """
         is_velocity_in_range(velocity)
-        self._send_cmd(('SCLS', velocity))
+        self._send_cmd('SCLS', velocity)
 
     @property
     def scale(self):
