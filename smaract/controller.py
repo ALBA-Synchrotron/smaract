@@ -139,7 +139,7 @@ class SmaractBaseController(list):
     @property
     def nchannels(self):
         """
-        GEt the number of channels available (does not represent the number of
+        Get the number of channels available (does not represent the number of
         currently connected positioners and effectors). The channels indexed are
         zero based.
 
@@ -192,6 +192,7 @@ class SmaractMCSController(SmaractBaseController):
         self._create_axes()
         
     def _create_axes(self):
+        # We need to remake the complete axis list
         try:
             while True:
                 self.pop()
@@ -208,9 +209,9 @@ class SmaractMCSController(SmaractBaseController):
                 axis = SmaractMCSAngularAxis(self, axis_nr)
                 self.append(axis)
             else:
-                # TODO: decide what to do
-                print('There is not axis class for sensor code %d' %
-                      sensor_code)
+                msg = "Failed to create axis %s\n" % axis_nr
+                msg += 'There is not axis class for sensor code %d' % sensor_code
+                raise RuntimeError()
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------
