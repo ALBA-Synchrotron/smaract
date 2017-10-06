@@ -93,7 +93,7 @@ class SmaractBaseController(list):
 
     def send_cmd(self, cmd):
         """
-        Communication functio used to send any command to the smaract
+        Communication function used to send any command to the smaract
         controller.
         :param cmd: string command following the Smaract ASCii Programming
         Interface.
@@ -113,6 +113,15 @@ class SmaractBaseController(list):
                                                    
                 raise RuntimeError(msg)
         return ans
+
+    @property
+    def comm_type(self):
+        """
+        Get the communication type for this controller.
+
+        :return: communication type
+        """
+        return self._comm.get_comm_type()
 
     # 3.1 - Initialization commands
     # -------------------------------------------------------------------------

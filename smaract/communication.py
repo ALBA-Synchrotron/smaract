@@ -33,10 +33,13 @@ class SmaractCommunication(object):
     def __init__(self, comm_type, *args):
         if comm_type == CommType.Serial:
             self._comm = SerialCom(*args)
+            self._comm_type = CommType.Serial
         elif comm_type == CommType.SerialTango:
             self._comm = SerialTangoCom(*args)
+            self._comm_type = CommType.SerialTango
         elif comm_type == CommType.Socket:
             self._comm = SocketCom(*args)
+            self._comm_type = CommType.Socket
         else:
             raise ValueError()
 
@@ -44,6 +47,9 @@ class SmaractCommunication(object):
         cmd = ':%s\n' % cmd
         ans = self._comm.send_cmd(cmd)
         return ans[1:-1]
+
+    def get_comm_type(self):
+        return self._comm_type
 
 
 class SerialCom(Serial):
