@@ -72,7 +72,10 @@ class Status(object):
                   }
 
 
-class ChannelProperties:
+class ChannelProperties(object):
+    """
+    Smaract channel properties
+    """
     EmergencyStop = 16842753
     EmergencyStopDefault = 16842797
     LowVibration = 16908289
@@ -83,7 +86,12 @@ class ChannelProperties:
     SensorScaleInverted = 135659539
     DigitalIn = 33554433
     DigitalInEdge = 33554434
-    # TODO: investigate the other properties
+    CounterTriggerSource = 67108867
+    Counter = 67108869
+    CaptureBuffer = 83886083
+    QueueSize = 100663300
+    QueueCapacity = 100663302
+
 
 class Direction(object):
     """
