@@ -538,8 +538,11 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         Documentation: MCS Manual section 3.5
         """
         ans = self._send_cmd('GFV')
-        # TODO: create human-readable string for return
-        return ans.split(',')[1:]
+        _ver = ans.split(',')[1:]
+        sc = "({0}){1}.{2}.{3}".format(*_ver[0:4])
+        sg = "({0}){1}.{2}.{3}".format(*_ver[-4:])
+        ret = "{0} - {1}".format(sc, sg)
+        return ret
 
     @property
     def emergency_stop(self):
