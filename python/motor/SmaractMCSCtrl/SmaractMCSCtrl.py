@@ -29,20 +29,30 @@
 ################################################################################
 
 import time
-from smaract import SmaractMCSController, CommType
+from smaract import SmaractMCSController, CommType, Status, Direction
 from sardana.pool.controller import MotorController, Type, Description, \
     Access, DataAccess, Memorize, Memorized
 
 from sardana import State
 
 
-HOME_LIN_SINGLE = 'home_linial_single'
+HOMING = 'homing'
+CALIBRATION = 'calibration'
 
 
-class SmaractMCSController(MotorController):
+class SmaractMCSCtrl(MotorController):
     """This class is the Tango Sardana motor controller for the Smaract MCS
-    motor controller device. It is designed to work linked to the TangoDS
-    PySmaract."""
+    motor controller device. It only exposes the API for the positioners
+    channel type.
+
+    Controller units for the angular positioner:
+
+        position: micro-degrees / step_per_unit
+        velocity: (micro-degree / step_per_unit) / s
+        time: s
+        acceleration (time): s
+
+    """
 
     MaxDevice = 16
 
@@ -60,57 +70,67 @@ class SmaractMCSController(MotorController):
     ctrl_extra_attributes = {}
 
     axis_attributes = {
-        'SafeDirection': {Type: str,
-                          Description: 'Configure the safe direction: '
-                                       'forward(0) or backward(1)',
-                          Access: DataAccess.ReadWrite,
-                          Memorized: Memorize,},
-        'SensorType': {Type: str,
-                       Description: 'Type of the sensor configured',
-                       Access: DataAccess.ReadWrite,
-                       Memorized: Memorized},
-        'ChannelType': {Type: str,
-                        Description: 'Channel type positioner(0), '
-                                     'endeffector(1)',
+        'Safe_Direction': {Type: str,
+                           Description: 'Configure the safe direction: '
+                                        'forward(0) or backward(1)',
+                           Access: DataAccess.ReadWrite,
+                           Memorized: Memorize},
+        'Sensor_Type': {Type: str,
+                        Description: 'Type of the sensor configured',
                         Access: DataAccess.ReadWrite,
                         Memorized: Memorized},
-        'Force': {Type: float,
-                  Description: 'Force measured by the sensor value in 1/10 uN',
-                  Access: DataAccess.ReadOnly},
-        'GripperOpening': {Type: float,
-                           Description: 'Current voltage applied to the '
-                                        'gripper. Value in 1/100 Vols',
-                           Access: DataAccess.ReadOnly},
-        'VoltageLevel': {Type: float,
-                         Description: 'Voltage applied to a positioner',
-                         Access: DataAccess.ReadOnly},
-        'SerialNumber': {Type: str,
-                         Description: 'Serial number',
-                         Access: DataAccess.ReadOnly},
-        'FirmwareVersion': {Type: str,
-                            Description: 'Firmware version',
-                            Access: DataAccess.ReadOnly},
-        'EmergencyStop': {Type: str,
-                          Description: 'Emergency stop behaviour',
-                          Access: DataAccess.ReadWrite,
-                          Memorized: Memorize},
-        'BroadcastStop': {Type: bool,
-                          Description: 'Broadcast stop enabled',
-                          Access: DataAccess.ReadWrite,
-                          Memorized: Memorize},
-        'ScaleInverted': {Type: bool,
-                          Description: 'Scale inverted enabled',
-                          Access: DataAccess.ReadWrite,
-                          Memorize: Memorized},
-        'ScaleOffset': {Type: long,
-                        Description: 'Scale offset in steps',
-                        Access: DataAccess.ReadWrite,
-                        Memorize: Memorized},
-        'ScaleLimits': {Type: [float],
-                        Description: 'Scale limits.',
-                        Access: DataAccess.ReadWrite,
-                        Memorize: Memorized},
-
+        'Channel_Type': {Type: str,
+                         Description: 'Channel type positioner(0), '
+                                      'endeffector(1)',
+                         Access: DataAccess.ReadOnly,
+                         Memorized: Memorized},
+        #
+        # TODO: These are only valid for end effector channel type
+        #
+        # 'Force': {Type: float,
+        #           Description: 'Force measured by the sensor value in 1/10 uN',
+        #           Access: DataAccess.ReadOnly},
+        # 'Gripper_Opening': {Type: float,
+        #                     Description: 'Current voltage applied to the '
+        #                                  'gripper. Value in 1/100 Vols',
+        #                    Access: DataAccess.ReadOnly},
+        #
+        'Voltage_Level': {Type: float,
+                          Description: 'Voltage applied to a positioner',
+                          Access: DataAccess.ReadOnly},
+        'Serial_Number': {Type: str,
+                          Description: 'Serial number',
+                          Access: DataAccess.ReadOnly},
+        'Firmware_Version': {Type: str,
+                             Description: 'Firmware version',
+                             Access: DataAccess.ReadOnly},
+        'Emergency_Stop': {Type: str,
+                           Description: 'Emergency stop behaviour',
+                           Access: DataAccess.ReadWrite,
+                           Memorized: Memorize},
+        'Broadcast_Stop': {Type: bool,
+                           Description: 'Broadcast stop enabled',
+                           Access: DataAccess.ReadWrite,
+                           Memorized: Memorize},
+        'Physical_Position_Known': {Type: bool,
+                                    Description: 'Physical position is known',
+                                    Access: DataAccess.ReadOnly},
+        'Scale_Inverted': {Type: bool,
+                           Description: 'Scale inverted enabled',
+                           Access: DataAccess.ReadWrite,
+                           Memorize: Memorized},
+        'Scale_Offset': {Type: long,
+                         Description: 'Scale offset in steps',
+                         Access: DataAccess.ReadWrite,
+                         Memorize: Memorized},
+        'Positioner_Limits': {Type: [float],
+                         Description: 'Scale limits.',
+                         Access: DataAccess.ReadWrite,
+                         Memorize: Memorized},
+        'Hold_Time': {Type: float,
+                      Description: 'Hold time after end movement',
+                      Access: DataAccess.ReadWrite,
+                      Memorized: Memorize},
     }
 
     def __init__(self, inst, props, *args, **kwargs):
@@ -125,25 +145,39 @@ class SmaractMCSController(MotorController):
         else:
             raise ValueError('Communication type is not valid')
         args = self.CommArgs.split(';')
-        self._mcs = SmaractMCSController(comm_type, *args)
+        try:
+            self._mcs = SmaractMCSController(comm_type, *args)
+        except Exception as e:
+            self._log.error(e)
         self._axes = {}
+        # TODO: Review when MaxDevice bug is fixed
+        # SmaractMCSCtrl.MaxDevice = self._mcs.nchannels
         self.MaxDevice = self._mcs.nchannels
 
     def AddDevice(self, axis):
+        # TODO: The raise exception is ignored.
+        # Issue 637 reported to sardana
+        if axis <= 0:
+            msg = "Axis MUST be greater than 0."
+            raise ValueError(msg)
         self._axes[axis] = {}
         self._axes[axis]['step_per_unit'] = 1.0
         self._axes[axis]['motor'] = self._mcs[axis-1]
+        self._axes[axis]['hold_time'] = 0.
 
     def DeleteDevice(self, axis):
         self._axes.pop(axis)
 
     def StateOne(self, axis):
         state_code, _, status = self._axes[axis]['motor'].status
-        # TODO: use the Status class
-        if state_code == 0:
+
+        if state_code in [Status.STOPPED, Status.HOLDING, Status.WAITING]:
             state = State.On
-        elif state_code == 4:
+        elif state_code in [Status.STEPPING, Status.SCANNING, Status.TARGETING,
+                            Status.CALIBRATING, Status.HOMING]:
             state = State.Moving
+        elif state_code in [Status.LOCKED]:
+            state = State.Disable
         else:
             state = State.Fault
 
@@ -155,8 +189,12 @@ class SmaractMCSController(MotorController):
         return position/step_per_unit
 
     def StartOne(self, axis, position):
-        position = position * self.attributes[axis]["step_per_unit"]
-        self._axes[axis]['motor'].move(position)
+        position = position * self._axes[axis]["step_per_unit"]
+        hold_time = self._axes[axis]["hold_time"]
+        self._log.debug('velocity %s' % self._axes[axis]['motor'].closed_loop_vel)
+        self._log.debug("position %s" % position)
+        self._log.debug("hold_time %s" % hold_time)
+        self._axes[axis]['motor'].move(position, hold_time)
 
     def SetPar(self, axis, name, value):
         """ Set the standard pool motor parameters.
@@ -165,12 +203,14 @@ class SmaractMCSController(MotorController):
         @param value to be set
         """
         name = name.lower()
-        step_per_unit = self.attributes[axis]["step_per_unit"]
+        step_per_unit = self._axes[axis]["step_per_unit"]
 
         if name == 'velocity':
             value = value * step_per_unit
             self._axes[axis]['motor'].closed_loop_vel = value
-        elif name == 'acceleration':
+        elif name in ['acceleration', 'deceleration']:
+            vel = self._axes[axis]['motor'].closed_loop_vel / step_per_unit
+            value = vel / (value * 1e3)
             value = value * step_per_unit
             self._axes[axis]['motor'].closed_loop_acc = value
         elif name == 'step_per_unit':
@@ -180,16 +220,19 @@ class SmaractMCSController(MotorController):
 
     def GetPar(self, axis, name):
         """ Get the standard pool motor parameters.
+
         @param axis to get the parameter
         @param name of the parameter to get the value
         @return the value of the parameter
         """
         name = name.lower()
-        step_per_unit = self.attributes[axis]["step_per_unit"]
+        step_per_unit = self._axes[axis]["step_per_unit"]
         if name == 'velocity':
-            result = self._axes[axis]['motor'].close_loop_vel * step_per_unit
+            result = self._axes[axis]['motor'].closed_loop_vel / step_per_unit
         elif name in ['acceleration', 'deceleration']:
-            result = self._axes[axis]['motor'].close_loop_acc * step_per_unit
+            acc = self._axes[axis]['motor'].closed_loop_acc / step_per_unit
+            value = self._axes[axis]['motor'].closed_loop_vel / (acc*1e3)
+            result = value / step_per_unit
         elif name == 'step_per_unit':
             result = step_per_unit
         elif name == 'base_rate':
@@ -199,7 +242,7 @@ class SmaractMCSController(MotorController):
         return result
 
     def AbortOne(self, axis):
-        self._axes['motor'].stop()
+        self._axes[axis]['motor'].stop()
 
     def GetAxisExtraPar(self, axis, name):
         """ Get Smaract axis particular parameters.
@@ -208,32 +251,38 @@ class SmaractMCSController(MotorController):
         @return the value of the parameter
         """
         name = name.lower()
-        if name == 'safedirection':
+        step_per_unit = self._axes[axis]["step_per_unit"]
+        if name == 'safe_direction':
             result = self._axes[axis]['motor'].safe_direction
-        elif name == 'sensortype':
+        elif name == 'sensor_type':
             result = self._axes[axis]['motor'].sensor_type
-        elif name == 'channeltype':
+        elif name == 'channel_type':
             result = self._axes[axis]['motor'].channel_type
         elif name == 'force':
             result = self._axes[axis]['motor'].force
-        elif name == 'gripperopening':
+        elif name == 'gripper_opening':
             result = self._axes[axis]['motor'].gripper_opening
-        elif name == 'voltagelevel':
+        elif name == 'voltage_level':
             result = self._axes[axis]['motor'].voltage_level
-        elif name == 'serialnumber':
+        elif name == 'serial_number':
             result = self._axes[axis]['motor'].serial_number
-        elif name == 'firmwareversion':
+        elif name == 'firmware_version':
             result = self._axes[axis]['motor'].firmware_version
-        elif name == 'emergencystop':
+        elif name == 'emergency_stop':
             result = self._axes[axis]['motor'].emergency_stop
-        elif name == 'broadcaststop':
+        elif name == 'broadcast_stop':
             result = self._axes[axis]['motor'].broadcast_stop
-        elif name == 'scaleinverted':
-            result = self._axes[axis]['motor'].scale_inverted
-        elif name == 'scaleoffset':
+        elif name == 'physical_position_known':
+            result = self._axes[axis]['motor'].physical_position_known
+        elif name == 'scale_inverted':
+            result = self._axes[axis]['motor'].scale_inverted / step_per_unit
+        elif name == 'scale_offset':
             result = self._axes[axis]['motor'].scale_offset
-        elif name == 'scalelimits':
-            result = self._axes[axis]['motor'].position_limits
+        elif name == 'positioner_limits':
+            values = self._axes[axis]['motor'].position_limits
+            result = [x/step_per_unit for x in values]
+        elif name == 'hold_time':
+            result = self._axes[axis]['hold_time'] / 1e3
         else:
             raise ValueError('There is not %s attribute' % name)
         return result
@@ -245,73 +294,90 @@ class SmaractMCSController(MotorController):
         @param value to be set
         """
         name = name.lower()
-        if name == 'safedirection':
+        step_per_unit = self._axes[axis]["step_per_unit"]
+        if name == 'safe_direction':
             self._axes[axis]['motor'].safe_direction = value
-        elif name == 'sensortype':
+        elif name == 'sensor_type':
             self._axes[axis]['motor'].sensor_type = value
-        elif name == 'channeltype':
+        elif name == 'channel_type':
             self._axes[axis]['motor'].channel_type = value
-        elif name == 'emergencystop':
+        elif name == 'emergency_stop':
             self._axes[axis]['motor'].emergency_stop = value
-        elif name == 'broadcaststop':
+        elif name == 'broadcast_stop':
             self._axes[axis]['motor'].broadcast_stop = value
-        elif name == 'scaleinverted':
-            self._axes[axis]['motor'].scale_inverted = value
-        elif name == 'scaleoffset':
+        elif name == 'scale_inverted':
+            self._axes[axis]['motor'].scale_inverted = value * step_per_unit
+        elif name == 'scale_offset':
             self._axes[axis]['motor'].scale_offset = value
-        elif name == 'scalelimits':
-            self._axes[axis]['motor'].position_limits = value
+        elif name == 'positioner_limits':
+            values = [x * step_per_unit for x in value]
+            # Convert from nparray to list
+            self._axes[axis]['motor'].position_limits = values
+        elif name == 'hold_time':
+            self._axes[axis]['hold_time'] = value * 1e3
         else:
             raise ValueError('There is not %s attribute' % name)
 
     def SendToCtrl(self, cmd):
-        """ Send custom native commands.
-        @param string representing the command
-        @return the result received
         """
-        mode = cmd.split(':')[0]
+        Send custom native commands. The cmd is a space separated string
+        containing the command information. Parsing this string one gets
+        the command name and the following are the arguments for the given
+        command i.e.command_name, [arg1, arg2...]
 
-        # Prepare axis for homing single position mark mode
-        if mode == HOME_LIN_SINGLE:
+        When these methods are invoqued
+        :param cmd: string
+        :return: string (MANDATORY to avoid OMNI ORB exception)
+        """
+        # Get the process to send
+        mode = cmd.split(' ')[0].lower()
+        args = cmd.strip().split(' ')[1:]
 
-            axis, direction = cmd.split(':')[1].strip().split(' ')
-            axis = int(axis)
-            direction = int(direction)
+        if mode == HOMING:
+            try:
+                if len(args) == 2:
+                    axis, direction = args
+                    axis = int(axis)
+                    direction = int(direction)
+                else:
+                    raise ValueError('Invalid number of arguments')
+            except Exception as e:
+                self._log.error(e)
 
-            self._log.info('Starting %s for axis %s in direction %s' % (
-            HOME_LIN_SINGLE, axis, direction))
+            self._log.info('Starting homing for axis %s in direction id %s' %
+                           (axis, direction))
+            try:
+                self._axes[axis]['motor'].find_reference_mark(direction, 0, 1)
+            except Exception as e:
+                self._log.error(e)
 
-            self.smaractMCS.command_inout("SetSafeDirection", [axis, direction])
-            # TANGO8 version can wait for the command to finish
-            # self.smaractMCS.command_inout("FindReferenceMark", axis, wait=True)
-            # TANGO7 version needs a timesleep to let the command finish
-            self.smaractMCS.command_inout("FindReferenceMark", axis)
-            time.sleep(5)
-            success = self.smaractMCS.command_inout("GetPhysicalPositionKnown",
-                                                    axis)
+            # Mandatory to let the system to update internals
+            time.sleep(0.3)
+            success = self._axes[axis]['motor'].physical_position_known
 
             if success:
-                self._log.info(
-                    '%s has finished successfully.' % HOME_LIN_SINGLE)
-                self._log.info('Configuring Smaract limits')
-                # lower, upper = self.smaractMCS.get_property('limits')['lim_0'][0].split(',')
-                limits_list = self.smaractMCS.get_property('limits')['limits'][
-                    0].split(';')
-                lower = limits_list[axis].split(",")[1]
-                upper = limits_list[axis].split(",")[2]
-                lower = long(lower)
-                upper = long(upper)
-                self.smaractMCS.command_inout("SetPositionLimits",
-                                              [axis, lower, upper])
-                limits = self.smaractMCS.command_inout("GetPositionLimits",
-                                                       axis)
-                self._log.info('Current limits: %s' % repr(limits))
-                return 'READY'
+                msg = 'Homing axis %s has finished. ' % axis
+                msg += 'Proceed to setup the Smaract limits (if necessary)'
+                self._log.info(msg)
+                return msg
             else:
-                self._log.warning(
-                    '%s failed:  no physical position known!' % HOME_LIN_SINGLE)
                 return 'ERROR: No physical position known.'
-        else:
-            self._log.warning('Invalid homing mode requested.')
-            return 'ERROR: Invalid homing mode requested.'
+        elif mode == CALIBRATION:
+            try:
+                if len(args) == 1:
+                    axis = args[0]
+                    axis = int(axis)
+                else:
+                    raise ValueError('Invalid number of arguments')
+            except Exception as e:
+                self._log.error(e)
 
+            self._log.info('Calibrating sensor/axis %s' % axis)
+            try:
+                self._axes[axis]['motor'].calibrate_sensor
+            except Exception as e:
+                self._log.error(e)
+            return 'Calibration finished.'
+        else:
+            self._log.warning('Invalid command')
+            return 'ERROR: Invalid command requested.'
