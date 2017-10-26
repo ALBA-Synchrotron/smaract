@@ -360,7 +360,9 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         Documentation: MCS Manual section 3.1
         """
         ans = self._send_cmd('GCT')
-        return float(ans.split(',')[1])
+        ch_type = int(ans.split(',')[1])
+        result = ['positioner', 'effector'][ch_type]
+        return result
 
     @property
     def closed_loop_acc(self):
@@ -984,7 +986,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         """
         ans = self._send_cmd('GA')
         angle, revolution = [float(x) for x in ans.split(',')[-2:]]
-        position = (revolution * 360) + (angle * 1e-6)
+        position = (revolution * TURN) + angle
         return position
 
     @property
@@ -1000,8 +1002,8 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         ans = self._send_cmd('GAL')
         # Answer (minAngle, minRev, maxAngle, maxRev)
         values = [float(x) for x in ans.split(',')[-4:]]
-        min_angle = (values[1] * 360) + (values[0] * 1e-6)
-        max_angle = (values[3] * 360) + (values[2] * 1e-6)
+        min_angle = (values[1] * TURN) + values[0]
+        max_angle = (values[3] * TURN) + values[2]
         return [min_angle, max_angle]
 
     @position_limits.setter
@@ -1015,32 +1017,41 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
 
         Documentation: MCS Manual section 3.2
         """
-
         if type(limits) not in [tuple, list]:
             raise ValueError('The value should be a list/tuple read the help.')
 
         values = []
         for limit in limits:
-            values.append(int((limit % 360) * 1e6))  # angle
-            values.append(int(limit / 360))  # revolution
+            angle, revolutions = self._angle_rev(limit)
+            values.append(angle)  # angle
+            values.append(revolutions)  # revolution
         self._send_cmd('SAL', *values)
 
     ############################################################################
     #                       Commands
     ############################################################################
-    def move(self, position):
+    def move(self, position, hold_time=0):
         """
-        Move method
-        :param position: the position is the absolute total angle
+        Move method. The units are micro-degrees and milliseconds.
+        :param relative_pos: the position is the absolute total angle
         :return:
         """
-        angle = abs(int((position % 360) * 1e6))
-        revolutions = int(position / 360)
-        self.move_angle_absolute(angle, revolutions)
+        angle, revolutions = self._angle_rev(position)
+        hold_time = int(hold_time)
+        self.move_angle_absolute(angle, revolutions, hold_time)
+
+    def _angle_rev(self, position):
+        sign = 0
+        if position < 0:
+            sign = -1
+        angle = int(position % TURN)
+        revolutions = int(position / TURN) + sign
+        return angle, revolutions
 
     def move_angle_absolute(self, angle, rev, hold_time=0):
         """
         Instructs the positioner to turn to a specific angle value.
+        The units are micro-degree and millisecond
         Channel Type: Positioner.
 
         :param angle: target angle.
@@ -1059,6 +1070,7 @@ class SmaractMCSAngularAxis(SmaractMCSBaseAxis):
         """
         Instructs the positioner to turn to an angle relative to its current
         position.
+        The units are micro-degree and millisecond
         Channel Type: Positioner.
 
         :param angle: angle increment.
