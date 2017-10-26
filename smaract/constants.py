@@ -29,6 +29,8 @@ MAX_TRIGGER = 255
 MIN_HOLD_TIME = 0
 MAX_HOLD_TIME = 60000
 
+TURN = 360*1e6
+
 
 class Status(object):
     """
@@ -54,7 +56,7 @@ class Status(object):
                   7: 'Finding reference mark',
                   9: 'Locked'}
     
-    status_txt = {0: 'The positioner is currently not performing active ' 
+    status_txt = {0: 'The positioner is currently not performing any active ' 
                      'movement.',
                   1: 'The positioner is performing an open-loop movement.',
                   2: 'The positioner is performing a scanning movement.',
@@ -62,12 +64,12 @@ class Status(object):
                      'or is holding the reference mark',
                   4: 'The positioner is performing a close-loop movement.',
                   5: 'The positioner is currently waiting for the sensor to '
-                      'power up before executing the movement command. This '
-                      'status may be returned if the sensors are operated '
-                      ' in power save mode.',
+                     'power up before executing the movement command. This '
+                     'status may be returned if the sensors are operated '
+                     ' in power save mode.',
                   6: 'The positioner is buusy calibrating its sensor.',
                   7: 'The positioner is moving to find the reference mark.',
-                  9: 'An emergency stop has occurred and futher movements '
+                  9: 'An emergency stop has occurred and further movements '
                      'are not allowed.'
                   }
 
@@ -101,10 +103,10 @@ class Direction(object):
     BACKWARD = 1
     FORWARD_BACKWARD = 2
     BACKWARD_FORWARD = 3
-    FORWARD_END = 4
-    BACKWARD_END = 5
-    FORWARD_BACKWARD_END = 6
-    BACKWARD_FORWARD_END = 7
+    FORWARD_ABORT_ON_END = 4
+    BACKWARD_ABORT_ON_END = 5
+    FORWARD_BACKWARD_ABORT_ON_END = 6
+    BACKWARD_FORWARD_ABORT_ON_END = 7
 
 
 class TableIndex(object):
@@ -132,7 +134,7 @@ class ChannelType(object):
     Defines the channel types available
     """
     POSITIONER = 0
-    EFFECTOR = 0
+    EFFECTOR = 1
 
 
 class HandControlModuleMode(object):
