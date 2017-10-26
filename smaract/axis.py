@@ -934,7 +934,7 @@ class SmaractMCSBaseAxis(SmaractBaseAxis):
         """
         is_opening_relative_in_range(opening)
         is_speed_in_range(speed)
-        self._send_cmd('MGOA', opening, speed)
+        self._send_cmd('MGOR', opening, speed)
 
     def move_scan_absolute(self, target, scan_speed):
         """
