@@ -5,13 +5,18 @@
 
 Welcome to smaract's documentation!
 ===================================
-
-Contents:
-
 .. toctree::
    :maxdepth: 2
 
    smaract
+
+User Manual
+===========
+.. toctree::
+   :maxdepth: 2
+
+   user_guide/basic
+
 
 Indices and tables
 ==================

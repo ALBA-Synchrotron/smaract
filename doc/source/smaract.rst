@@ -1,9 +1,14 @@
-*****************************************************
-smaract: Python library for Smaract Motor Controllers
-*****************************************************
+*************************************************
+A Python library for the SmarAct Motor Controller
+*************************************************
 
-This module is intended to be used as an entry point for the communication
-with Smaract motor controllers.
+This python module has been written to interface the SmarAct MCS
+controllers via ASCII interface.
+
+The library and documentation are based on the official documentation from
+SmarAct GmbH 2013:
+
+`MCS - Modular Control System. ASCII Programming Interface.`
 
 .. automodule:: smaract
    :members:
