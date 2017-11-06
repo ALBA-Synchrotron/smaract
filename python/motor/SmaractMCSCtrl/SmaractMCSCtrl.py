@@ -45,12 +45,19 @@ class SmaractMCSCtrl(MotorController):
     motor controller device. It only exposes the API for the positioners
     channel type.
 
-    Controller units for the angular positioner:
+    1.- Controller units for the angular positioner:
 
         position: micro-degrees / step_per_unit
         velocity: (micro-degree / step_per_unit) / s
         time: s
         acceleration (time): s
+
+    2.- The dimensions of the acceleration for the smaract controller are:
+    [distance/time^2]. However, the Sardana acceleration (acc_time) is, in
+    fact, the time required to reach the target velocity given a the current
+    smaract controller acceleration i.e.
+
+        acc_time = velocity/acceleration
 
     """
 
@@ -325,7 +332,6 @@ class SmaractMCSCtrl(MotorController):
         the command name and the following are the arguments for the given
         command i.e.command_name, [arg1, arg2...]
 
-        When these methods are invoqued
         :param cmd: string
         :return: string (MANDATORY to avoid OMNI ORB exception)
         """
