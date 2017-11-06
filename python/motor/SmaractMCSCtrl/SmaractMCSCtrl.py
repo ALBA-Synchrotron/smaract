@@ -365,7 +365,8 @@ class SmaractMCSCtrl(MotorController):
                 msg = 'Homing axis %s has finished. ' % axis
                 msg += 'Proceed to setup the Smaract limits (if necessary)'
                 self._log.info(msg)
-                return msg
+                # This string is expected from homing macro
+                return "[DONE]"
             else:
                 return 'ERROR: No physical position known.'
         elif mode == CALIBRATION:
