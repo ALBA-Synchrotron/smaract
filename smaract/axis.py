@@ -1123,13 +1123,14 @@ class SmaractMCSLinearAxis(SmaractMCSBaseAxis):
     ############################################################################
     #                       Commands
     ############################################################################
-    def move(self, position):
+    def move(self, position, hold_time=0):
         """
         Move method
         :param position: the position is the absolute total angle
         :return:
         """
-        self.move_position_absolute(position)
+        hold_time = int(hold_time)
+        self.move_position_absolute(position, hold_time)
 
     def move_position_absolute(self, position, hold_time=0):
         """
