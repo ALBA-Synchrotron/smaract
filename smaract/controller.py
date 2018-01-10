@@ -1,3 +1,14 @@
+# ------------------------------------------------------------------------------
+# This file is part of smaract (https://github.com/ALBA-Synchrotron/smaract)
+#
+# Copyright 2008-2017 CELLS / ALBA Synchrotron, Bellaterra, Spain
+#
+# Distributed under the terms of the GNU General Public License,
+# either version 3 of the License, or (at your option) any later version.
+# See LICENSE.txt for more info.
+# ------------------------------------------------------------------------------
+
+
 from constants import *
 from axis import SmaractSDCAxis, SmaractMCSAngularAxis, SmaractMCSLinearAxis
 from communication import SmaractCommunication
