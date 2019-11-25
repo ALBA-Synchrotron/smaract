@@ -11,9 +11,12 @@
 # along with smaract. If not, see <http://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------------
 
-
+import sys
 from serial import Serial
 from socket import socket, AF_INET, SOCK_STREAM
+
+# TODO remove when use only python 3
+PY34 = sys.version_info >= (3, 4)
 
 
 def comm_error_handler(f):
@@ -26,7 +29,7 @@ def comm_error_handler(f):
         try:
             ans = f(*args, **kwargs)
             return ans
-        except Exception, e:
+        except Exception as e:
             msg = ('Problem with the communication. Verify the hardware. '
                    'Error: %s' % e)
             raise RuntimeError(msg)
@@ -74,8 +77,14 @@ class SerialCom(Serial):
     @comm_error_handler
     def send_cmd(self, cmd):
         self.flush()
+        # TODO remove when use only python 3
+        if PY34:
+            cmd = cmd.encode()
         self.write(cmd)
-        return self.readline()
+        result = self.readline()
+        if PY34:
+            result = result.decode()
+        return result
 
 
 class SerialTangoCom(object):
@@ -111,5 +120,11 @@ class SocketCom(socket):
                                'Error: %s' % e)
     @comm_error_handler
     def send_cmd(self, cmd):
+        # TODO remove when use only python 3
+        if PY34:
+            cmd = cmd.encode()
         self.sendall(cmd)
-        return self.recv(1024)
+        result = self.recv(1024)
+        if PY34:
+            result = result.decode()
+        return result

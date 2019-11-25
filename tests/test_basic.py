@@ -36,51 +36,51 @@ class TestCommunication(unittest.TestCase):
         self.ctrl._comm._comm.close()
 
     def test_connexion(self):
-        print "\n*** Testing connection ***"
+        print("\n*** Testing connection ***")
         try:
-            print "Controller ID: %s" % self.ctrl.id
-            print "Interface: %s" % self.ctrl.version
-            print "Communication type: %s" % self.ctrl.comm_type
+            print("Controller ID: %s" % self.ctrl.id)
+            print("Interface: %s" % self.ctrl.version)
+            print("Communication type: %s" % self.ctrl.comm_type)
         except Exception as e:
-            print '%s' % str(e)
+            print('%s' % str(e))
 
         if isinstance(self.ctrl, SmaractMCSController):
-            print "Communication mode: %s" % self.ctrl.communication_mode
-            print "Number of channels: %s" % self.ctrl.nchannels
+            print("Communication mode: %s" % self.ctrl.communication_mode)
+            print("Number of channels: %s" % self.ctrl.nchannels)
 
     def test_axes(self):
-        print "\n*** Testing MCS axes ***"
+        print("\n*** Testing MCS axes ***")
 
         if isinstance(self.ctrl, SmaractMCSController):
             try:
-                print "Axes/sensors enabled: %s" % self.ctrl.sensor_enabled
+                print("Axes/sensors enabled: %s" % self.ctrl.sensor_enabled)
 
                 for axis in self.ctrl:
                     self._axis_status(axis)
 
             except Exception as e:
-                print '%s' % str(e)
+                print('%s' % str(e))
 
     def _axis_status(self, a):
-        print "Channel %s" % a._axis_nr
-        print "\tState %s" % a.state
-        print "\tStatus %s" % repr(a.status)
-        print "\tSerial number: %s" % a.serial_number
-        print "\tSensor type: %s" % a.sensor_type
-        print "\tChannel type: %s" % a.channel_type
-        print "\tFirmware version: %s" % repr(a.firmware_version)
-        print "\tCurrent safe direction: %s" % a.safe_direction
-        print "\tScale inverted: %s" % a.scale_inverted
-        print "\tScale offset: %s" % a.scale_offset
+        print("Channel %s" % a._axis_nr)
+        print("\tState %s" % a.state)
+        print("\tStatus %s" % repr(a.status))
+        print("\tSerial number: %s" % a.serial_number)
+        print("\tSensor type: %s" % a.sensor_type)
+        print("\tChannel type: %s" % a.channel_type)
+        print("\tFirmware version: %s" % repr(a.firmware_version))
+        print("\tCurrent safe direction: %s" % a.safe_direction)
+        print("\tScale inverted: %s" % a.scale_inverted)
+        print("\tScale offset: %s" % a.scale_offset)
 
     @ unittest.skip('RW properties test not fully implemented')
     def test_read_write(self):
-        print "\n*** Testing MCS read/write properties ***"
+        print("\n*** Testing MCS read/write properties ***")
         properties = ['closed_loop_vel', 'closed_loop_acc']
         self.ctrl.sensor_enabled = 1
         for axis in self.ctrl:
             for p in properties:
-                print "\t R/W %s" % p
+                print("\t R/W %s" % p)
                 v0 = getattr(axis, p)
                 setattr(axis, p, v0 + 10)
                 v1 = getattr(axis, p)
@@ -96,8 +96,8 @@ def parse_args():
     parser.add_argument('--port', help='port', type=str)
     parser.add_argument('--timeout', help='timeout', type=int)
     ns, args = parser.parse_known_args(namespace=unittest)
-    print ns
-    print args
+    print(ns)
+    print(args)
     return ns, sys.argv[:1] + args
 
 

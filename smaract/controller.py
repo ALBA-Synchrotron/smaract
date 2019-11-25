@@ -9,9 +9,9 @@
 # ------------------------------------------------------------------------------
 
 
-from constants import *
-from axis import SmaractSDCAxis, SmaractMCSAngularAxis, SmaractMCSLinearAxis
-from communication import SmaractCommunication
+from .constants import *
+from .axis import SmaractSDCAxis, SmaractMCSAngularAxis, SmaractMCSLinearAxis
+from .communication import SmaractCommunication
 
 
 class SmaractBaseController(list):
