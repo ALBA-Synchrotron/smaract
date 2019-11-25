@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-################################################################################
+###############################################################################
 #
-# file :    SmaractMCSCtrl.py
+# file :    msc_motor.py
 #
 # developers : ctbeamlines@cells.es
 #
@@ -10,7 +10,7 @@
 #               Bellaterra
 #               Spain
 #
-################################################################################
+###############################################################################
 #
 # This file is part of Sardana.
 #
@@ -26,14 +26,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-################################################################################
+###############################################################################
 
 import time
-from smaract import SmaractMCSController, CommType, Status, Direction
 from sardana.pool.controller import MotorController, Type, Description, \
     Access, DataAccess, Memorize, Memorized
-
 from sardana import State
+
+# TODO Use relative import when Sardana allows entry points
+from smaract import SmaractMCSController, CommType, Status
 
 
 HOMING = 'homing'
@@ -126,7 +127,7 @@ class SmaractMCSCtrl(MotorController):
                            Description: 'Scale inverted enabled',
                            Access: DataAccess.ReadWrite,
                            Memorize: Memorized},
-        'Scale_Offset': {Type: long,
+        'Scale_Offset': {Type: int,
                          Description: 'Scale offset in steps',
                          Access: DataAccess.ReadWrite,
                          Memorize: Memorized},
