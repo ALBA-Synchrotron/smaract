@@ -18,5 +18,5 @@ from .constants import Direction, SensorMode, EffectorType, Status
 
 # The version is updated automatically with bumpversion
 # Do not update manually
-__version__ = '0.0.1-alpha'
+__version__ = '0.4.0'
 
