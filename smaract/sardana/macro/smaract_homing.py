@@ -1,8 +1,8 @@
 import time
+import PyTango
 from sardana.macroserver.macro import Macro, Type
 from taurus import Device
-from pyIcePAP import EthIcePAP
-import PyTango
+from icepap import IcePAPController
 
 DEV_STATE_ALARM = PyTango.DevState.ALARM
 DEV_STATE_MOVING = PyTango.DevState.MOVING
@@ -74,8 +74,8 @@ class smaract_sdc_homing(Macro):
         ipap_host = properties['Host'][0]
         motor_axis = motor.getAxis()
 
-        ipap = EthIcePAP(ipap_host, ipap_port, IPAP_TIMEOUT)
-        ipap.setEncoder(motor_axis, pos)
+        ipap = IcePAPController(ipap_host, ipap_port)
+        ipap[motor_axis].enc = pos
         set_pos = self.createMacro('set_user_pos', motor, 0)
         self.runMacro(set_pos)
 
