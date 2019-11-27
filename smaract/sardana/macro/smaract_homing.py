@@ -2,7 +2,12 @@ import time
 import PyTango
 from sardana.macroserver.macro import Macro, Type
 from taurus import Device
-from icepap import IcePAPController
+
+# TODO: Remove when use only python 3
+try:
+    from icepap import IcePAPController
+except Exception:
+    from pyIcePAP import EthIcePAPController as IcePAPController
 
 DEV_STATE_ALARM = PyTango.DevState.ALARM
 DEV_STATE_MOVING = PyTango.DevState.MOVING
