@@ -157,10 +157,11 @@ class SmaractMCSCtrl(MotorController):
             self._mcs = SmaractMCSController(comm_type, *args)
         except Exception as e:
             self._log.error(e)
+        else:
+            # TODO: Review when MaxDevice bug is fixed
+            # SmaractMCSCtrl.MaxDevice = self._mcs.nchannels
+            self.MaxDevice = self._mcs.nchannels
         self._axes = {}
-        # TODO: Review when MaxDevice bug is fixed
-        # SmaractMCSCtrl.MaxDevice = self._mcs.nchannels
-        self.MaxDevice = self._mcs.nchannels
 
     def AddDevice(self, axis):
         # TODO: The raise exception is ignored.
