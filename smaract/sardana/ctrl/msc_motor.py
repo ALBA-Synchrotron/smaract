@@ -205,7 +205,7 @@ class SmaractMCSCtrl(MotorController):
         self._log.debug("hold_time %s" % hold_time)
         self._axes[axis]['motor'].move(position, hold_time)
 
-    def SetPar(self, axis, name, value):
+    def SetAxisPar(self, axis, name, value):
         """ Set the standard pool motor parameters.
         @param axis to set the parameter
         @param name of the parameter
@@ -227,7 +227,7 @@ class SmaractMCSCtrl(MotorController):
         else:
             self._log.debug('Parameter %s is not set' % name)
 
-    def GetPar(self, axis, name):
+    def GetAxisPar(self, axis, name):
         """ Get the standard pool motor parameters.
 
         @param axis to get the parameter
