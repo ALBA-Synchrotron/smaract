@@ -64,7 +64,7 @@ class SmaractMCSCtrl(MotorController):
 
     MaxDevice = 16
 
-    class_prop = {
+    ctrl_properties = {
         'CommType': {Type: str,
                      Description: 'Communication type: Serial, Tango, Socket'},
 
