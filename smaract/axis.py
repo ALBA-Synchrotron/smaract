@@ -13,7 +13,7 @@
 
 
 import weakref
-from constants import *
+from .constants import *
 
 
 class SmaractBaseAxis(object):
